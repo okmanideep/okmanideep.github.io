@@ -3,28 +3,28 @@ markdown: redcarpet
 highlighter: pygments
 paginate: 5
 language: 'en-uk'
+# edit baseurl to simply '/' if using as your personal page (instead of a project page)
+baseurl: ''
 
 # Website info
-name: 'Finding The Way Home'
-description: "A beautiful narrative written with the world's most elegant publishing platform. The story begins here."
+name: 'Blog | Manidesto'
+description: "Android · Development · Design"
 
 # Author's info
-author: 'Casper McFadden'
+author: 'Manideep Polireddi'
 # edit 'categories' in the front matter of every post to match this username
-username: casper
-bio: 'A paranormal expert and his daughter bunk in an abandoned house populated by 3 mischievous ghosts and one friendly one.'
-location: 'Maine, USA'
-url: 'http://biomadeira.github.io/jasper/'
-image: 'assets/images/casper.png'
+username: manidesto
+bio: 'Android developer · Design Enthusiast'
+location: 'Mumbai, India'
+url: 'http://manidesto.github.io/'
+image: 'assets/images/manidesto.png'
 
-short_url: 'biomadeira.github.io/jasper/'
-google_analytics: UA-69281367-1
-disqus: username
-# edit baseurl to simply '/' if using as your personal page (instead of a project page)
-baseurl: /jasper/
+short_url: 'manidesto.github.io/'
+google_analytics: UA-57441445-3
+#disqus: username
 
 # Permalinks
-permalink: /:title
+permalink: :title
 # permalink: /author/:username
 # permalink: /tag/:tag
 
