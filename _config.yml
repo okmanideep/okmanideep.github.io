@@ -1,8 +1,13 @@
 # Jykell configuration
 markdown: redcarpet
+redcarpet:
+  extensions:
+  - fenced_code_blocks
+  - footnotes
 highlighter: pygments
 paginate: 5
 language: 'en-uk'
+timezone: 'Asia/Kolkata'
 # edit baseurl to simply '/' if using as your personal page (instead of a project page)
 baseurl: ''
 
