@@ -6,7 +6,7 @@ date:   2015-11-14 20:10:00
 tags: android
 class: 'post-template'
 subclass: 'post tag-android'
-categories: 'casper'
+categories: 'manidesto'
 navigation: True
 logo: '/assets/images/logo_black.png'
 ---

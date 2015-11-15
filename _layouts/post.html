@@ -56,7 +56,7 @@ disqus: false
 
             {% if site.image %}
             <figure class="author-image">
-                <a class="img" href="{{ site.baseurl }}/author/{{ site.username }}" style="background-image: url({{ site.baseurl }}/{{ site.image }})"><span class="hidden">{{ page.author }}'s Picture</span></a>
+                <a class="img" href="{{ site.baseurl }}/author/{{ site.username }}" style="background-image: url({{ site.baseurl }}{{ site.image }})"><span class="hidden">{{ page.author }}'s Picture</span></a>
             </figure>
             {% endif %}
 
@@ -70,7 +70,8 @@ disqus: false
                 {% endif %}
                 <div class="author-meta">
                     {% if site.location %}<span class="author-location icon-location"> {{ site.location }}</span>{% endif %} 
-                    {% if site.url %}<span class="author-link icon-link"><a href="{{ site.url }}"> {{ site.short_url }}</a></span>{% endif %} 
+                    <!-- {% if site.url %}<span class="author-link icon-link"><a href="{{ site.url }}"> {{ site.short_url }}</a></span>{% endif %} -->
+                {% if site.twitter %}<span class="author-twitter icon-twitter"><a href="https://twitter.com/{{ site.twitter }}">@{{ site.twitter }}</a></span>{% endif %}
                 </div>
             </section>
 

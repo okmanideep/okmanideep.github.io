@@ -22,7 +22,8 @@ username: manidesto
 bio: 'Android developer · Design Enthusiast'
 location: 'Mumbai, India'
 url: 'http://manidesto.github.io/'
-image: 'assets/images/manidesto.png'
+image: '/assets/images/manidesto.png'
+twitter: 'manidesto'
 
 short_url: 'manidesto.github.io/'
 google_analytics: UA-57441445-3
