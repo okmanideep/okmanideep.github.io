@@ -9,19 +9,19 @@
     <meta property="og:url" content="{{ site.baseurl }}" />
     <meta property="og:image" content="{{ site.baseurl }}assets/images/cover1.jpg" />
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="{{ site.name }}" />
-    <meta name="twitter:description" content="{{ site.description }}" />
-    <meta name="twitter:url" content="{{ site.baseurl }}" />
-    <meta name="twitter:image:src" content="{{ site.baseurl }}assets/images/cover1.jpg" />
+    <meta name="twitter:card" content="{% if page.cover %}summary_large_image{% else %}summary{% endif %}" />
+    <meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.name }}{% endif %}" />
+    <meta name="twitter:description" content="{% if page.description %}{{ page.description}}{% else %}{{ site.description }}{% endif %}" />
+    <meta name="twitter:image" content="{{ site.url }}{{ site.baseurl }}{% if page.cover %}{{ page.cover }}{% else %}{{ site.logo }}{% endif %}" />
+    <meta name="twitter:author" content="@{{ site.username }}">
 
     <script type="application/ld+json">
 {
     "@context": "http://schema.org",
     "@type": "Website",
-    "publisher": "Finding The Way Home",
+    "publisher": "Manidesto",
     "url": "{{ site.baseurl }}",
-    "image": "{{ site.baseurl }}assets/images/cover1.jpg",
+    "image": "{{ site.baseurl }}/assets/images/logo_black.jpg",
     "description": "{{ site.description }}"
 }
     </script>

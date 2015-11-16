@@ -14,6 +14,7 @@ baseurl: ''
 # Website info
 name: 'Blog | Manidesto'
 description: "Android · Development · Design"
+logo: '/assets/images/logo_black_square.png'
 
 # Author's info
 author: 'Manideep Polireddi'
@@ -21,7 +22,7 @@ author: 'Manideep Polireddi'
 username: manidesto
 bio: 'Android developer · Design Enthusiast'
 location: 'Mumbai, India'
-url: 'http://manidesto.github.io/'
+url: 'http://manidesto.github.io'
 image: '/assets/images/manidesto.png'
 twitter: 'manidesto'
 
