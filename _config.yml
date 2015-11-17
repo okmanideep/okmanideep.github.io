@@ -15,6 +15,7 @@ baseurl: ''
 name: 'Blog | Manidesto'
 description: "Android · Development · Design"
 logo: '/assets/images/logo_black_square.png'
+fblogo: '/assets/images/logo_fb.jpg'
 
 # Author's info
 author: 'Manideep Polireddi'
