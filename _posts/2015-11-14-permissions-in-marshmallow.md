@@ -97,13 +97,4 @@ public void onRequestPermissionsResult(int requestCode,
 ```
 
 If both `before` and `after` are `false`, then show the user a dialog explaining that we need the contacts permission with a 'GO TO SETTINGS' button. On click take him to your application in the settings like this :
-
-``` java
-private void goToSettings() {
-    Intent intent = new Intent();
-    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-    Uri uri = Uri.parse("package:" + getPackageName());
-    intent.setData(uri);
-    startActivity(intent);
-}
-```
+<script src="https://gist.github.com/manidesto/bcaf15a49d34d7908253.js"></script>
