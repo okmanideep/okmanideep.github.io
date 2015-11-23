@@ -13,13 +13,14 @@ logo: '/assets/images/logo_black.png'
 ---
 
 I expect you to first go and have a look at this page in the [Android Bible](http://developer.android.com/training/permissions/requesting.html) about permissions in marshmallow. Especially have a look at how to:
+
 - Request the permissions you need
 - Handle the permissions request response
 
 #### Requesting for permission ####
 You might have seen a code snippet like below in the training page.
 
-{% highlight java lineanchors %}
+```java
 // Here, thisActivity is the current activity
 if (ContextCompat.checkSelfPermission(thisActivity,
                 Manifest.permission.READ_CONTACTS)
@@ -32,7 +33,7 @@ if (ContextCompat.checkSelfPermission(thisActivity,
         //request permission
     }
 }
-{% endhighlight %}
+```
 
 ### Pay Attention ###
 Lets just dive into the only tricky part here - `shouldShowRequestPermissionRationale()` returns
@@ -56,7 +57,7 @@ There is no way to detect using the above code that we were denied the permissio
 ### The way out ###
 Check for `shouldShowRequestPermissionRationale()` before and after asking permission. If it returns false both the times then the user chose 'Don't ask again' in the past or the device policy doesn't allow for that permission.
 
-{% highlight java lineanchors %}
+```java{8-10,28-32}
 boolean before, after;
 
 public void requestContactsPermission() {
@@ -94,11 +95,11 @@ public void onRequestPermissionsResult(int requestCode,
         }
     }
 }
-{% endhighlight %}
+```
 
 If both `before` and `after` are `false`, then show the user a dialog explaining that we need the contacts permission with a 'GO TO SETTINGS' button. On click take him to your application in the settings like this :
 
-{% highlight java lineanchors %}
+```java
 private void goToSettings() {
     Intent intent = new Intent();
     intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -106,4 +107,4 @@ private void goToSettings() {
     intent.setData(uri);
     startActivity(intent);
 }
-{% endhighlight %}
+```

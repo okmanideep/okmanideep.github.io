@@ -1,9 +1,14 @@
 # Jykell configuration
-markdown: kramdown
+#markdown: kramdown
+markdown: redcarpet
+redcarpet:
+    extension:
+        - fenced_code_blocks
+        - footnotes
 highlighter: pygments
 pygments_options: ['lineanchors']
-kramdown:
-    fenced_code_blocks: true
+#kramdown:
+#fenced_code_blocks: true
 
 paginate: 5
 language: 'en-uk'
