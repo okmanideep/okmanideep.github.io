@@ -58,43 +58,43 @@ There is no way to detect using the above code that we were denied the permissio
 Check for `shouldShowRequestPermissionRationale()` before and after asking permission. If it returns false both the times then the user chose 'Don't ask again' in the past or the device policy doesn't allow for that permission.
 
 ```java{8-10,28-32}
-boolean before, after;
-
-public void requestContactsPermission() {
-    if (ContextCompat.checkSelfPermission(thisActivity,
-                    Manifest.permission.READ_CONTACTS)
-            != PackageManager.PERMISSION_GRANTED) {
-        // Should we show an explanation?
-        before = ActivityCompat.shouldShowRequestPermissionRationale(thisActivity,
-                Manifest.permission.READ_CONTACTS);
-        if (before) {
-            //show user the reason for permission
-        } else {
-            //request permission
-        }
-    }
-}
-
-@Override
-public void onRequestPermissionsResult(int requestCode,
-        String permissions[], int[] grantResults) {
-    switch (requestCode) {
-        case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
-            if (grantResults.length > 0
-                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // permission was granted, yay! Do the
-                // contacts-related task you need to do.
-            } else {
-                after = ActivityCompat.shouldShowRequestPermissionRationale(
-                thisActivity,
-                Manifest.permission.READ_CONTACTS);
-                boolean goToSettings = !(after || before);
-                showRationale(goToSettings);
-            }
-            return;
-        }
-    }
-}
+  boolean before, after;
+  
+  public void requestContactsPermission() {
+      if (ContextCompat.checkSelfPermission(thisActivity,
+                      Manifest.permission.READ_CONTACTS)
+              != PackageManager.PERMISSION_GRANTED) {
+          // Should we show an explanation?
+          before = ActivityCompat.shouldShowRequestPermissionRationale(thisActivity,
+                  Manifest.permission.READ_CONTACTS);
+          if (before) {
+              //show user the reason for permission
+          } else {
+              //request permission
+          }
+      }
+  }
+  
+  @Override
+  public void onRequestPermissionsResult(int requestCode,
+          String permissions[], int[] grantResults) {
+      switch (requestCode) {
+          case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
+              if (grantResults.length > 0
+                  && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                  // permission was granted, yay! Do the
+                  // contacts-related task you need to do.
+              } else {
+                  after = ActivityCompat.shouldShowRequestPermissionRationale(
+                  thisActivity,
+                  Manifest.permission.READ_CONTACTS);
+                  boolean goToSettings = !(after || before);
+                  showRationale(goToSettings);
+              }
+              return;
+          }
+      }
+  }
 ```
 
 If both `before` and `after` are `false`, then show the user a dialog explaining that we need the contacts permission with a 'GO TO SETTINGS' button. On click take him to your application in the settings like this :

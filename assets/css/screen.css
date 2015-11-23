@@ -2038,7 +2038,7 @@ body:not(.post-template) .post-title {
  * Courtesy of GitHub.com
  */
 
-.highlight pre, pre { background-color: #ffffff; border: 1px solid #ccc; border-radius: 3px; line-height: 1.3em; font-size: 14px; padding-left: 6px; }
+.highlight pre, pre { background-color: #ffffff; border: 1px solid #ccc; border-radius: 3px; line-height: 1.3em; font-size: 14px;}
 
 .highlight .c { color: #888888 } /* Comment */
 .highlight .err { color: #a61717; background-color: #e3d2d2 } /* Error */
