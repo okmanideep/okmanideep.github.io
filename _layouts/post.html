@@ -40,6 +40,8 @@ disqus: false
                     {% endif %}   
                 {% endfor %}
                 {% endif %}
+                 · 
+                <span class="post-author">by <a rel="author" href="{{ site.baseurl }}/author/{{ site.username }}">{{ site.author }}</a>
             </section>
         </header>
 
@@ -61,7 +63,7 @@ disqus: false
             {% endif %}
 
             <section class="author">
-                <h4><a href="{{ site.baseurl }}/author/{{ site.username }}">{{ site.author }}</a></h4>
+                <h4><a href="{{ site.baseurl }}/author/{{ site.username }}" rel="author">{{ site.author }}</a></h4>
                 
                 {% if site.bio %}
                     <p> {{ site.bio }}</p>
