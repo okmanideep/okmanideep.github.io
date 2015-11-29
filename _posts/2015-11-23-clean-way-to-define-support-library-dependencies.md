@@ -51,3 +51,5 @@ dependencies {
     compile "com.android.support:recyclerview-v7:${supportLibVersion}"
 }
 ```
+
+By the way, Android Studio is intelligent enough that it will suggest you to update the version when there is a new one out, even in the above format. All hail IntelliJ.
