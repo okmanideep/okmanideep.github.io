@@ -154,3 +154,19 @@ In this example `getTitleObservale("Micheal")` wasn't completed. So **FlatMap is
 Visualise what happened in the above example. Now think about the `map()` operator. If you feel like - 'They are two very different operators', then I have done my job. If you don't, [try confusing me as well](https://twitter.com/manidesto).
 
 I am no expert in this topic. Just sharing as I learn. Please [drop me a tweet](https://twitter.com/manidesto) or a comment if I got anything wrong. And share it to people who you think will find this useful.
+
+### EDIT ###
+
+[Artem Zinnatullin](http://artemzin.com/blog/rxjava-defer-execution-of-function-via-fromcallable/)'s post suggests a better way to for our getTitleObservable().
+
+```java
+return Observable.defer(() -> {
+    try {
+        return Observable.just(getTitle(name));
+    } catch(IllegalArgumentException e) {
+        return Observable.error(e);
+    }
+})
+```
+
+By using this method, you don't need to worry about calling the right functions to the subscriber. Thanks to [pakoito](https://www.reddit.com/r/androiddev/comments/3u5w0c/if_you_are_writing_observablecreate_theres_a_big/) for pointing that out.
