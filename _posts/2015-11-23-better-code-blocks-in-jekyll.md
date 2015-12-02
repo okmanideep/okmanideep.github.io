@@ -9,6 +9,7 @@ class: 'post-template'
 subclass: 'post tag-jekyll tag-gh-pages'
 categories: 'manidesto'
 navigation: True
+disqus: 20151123201000
 logo: '/assets/images/logo_black.png'
 ---
 

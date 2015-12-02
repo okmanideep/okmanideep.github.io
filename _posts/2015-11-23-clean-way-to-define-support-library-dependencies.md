@@ -9,6 +9,7 @@ class: 'post-template'
 subclass: 'post tag-android'
 categories: 'manidesto'
 navigation: True
+disqus: 20151124201000
 logo: '/assets/images/logo_black.png'
 ---
 
