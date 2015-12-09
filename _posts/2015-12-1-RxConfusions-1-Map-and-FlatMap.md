@@ -160,13 +160,7 @@ I am no expert in this topic. Just sharing as I learn. Please [drop me a tweet](
 [Artem Zinnatullin](http://artemzin.com/blog/rxjava-defer-execution-of-function-via-fromcallable/)'s post suggests a better way to for our getTitleObservable().
 
 ```java
-return Observable.defer(() -> {
-    try {
-        return Observable.just(getTitle(name));
-    } catch(IllegalArgumentException e) {
-        return Observable.error(e);
-    }
-})
+return Observable.fromCallable(() -> getTitle(name));
 ```
 
 By using this method, you don't need to worry about calling the right functions to the subscriber. Thanks to [pakoito](https://www.reddit.com/r/androiddev/comments/3u5w0c/if_you_are_writing_observablecreate_theres_a_big/) for pointing that out.
