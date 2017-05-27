@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+   
+      <title>okmanideep.github.io/</title>
+   
+   <link>https://okmanideep.github.io</link>
+   <description>Android · Development · Design</description>
+   <language>en-uk</language>
+   <managingEditor> Manideep Polireddi</managingEditor>
+   <atom:link href="rss" rel="self" type="application/rss+xml" />
+   
+	<item>
+	  <title>Improve your Android build times</title>
+	  <link>/improve-android-build-times</link>
+	  <author>Manideep Polireddi</author>
+	  <pubDate>2016-04-06T01:40:00+05:30</pubDate>
+	  <guid>/improve-android-build-times</guid>
+	  <description><![CDATA[
+	     <p>If you have the time to watch the video, go ahead. <a href="https://twitter.com/madisp">Madis Pink</a> goes over each optimisation you can do very carefully and how you can profile the gradle build process to identify the bottlenecks of your builds. If not, go ahead do the changes mentioned below, which will take less than two minutes and enjoy a much smaller build times.</p>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/AbNhen_zn-c" frameborder="0" allowfullscreen></iframe>
+
+<h2>Optimisations</h2>
+
+<h4>The minSdk 21 trick</h4>
+
+<p>It doesn&#39;t matter your app is over the 65K method limit or not, enabling multiDex and having product flavors like this help a lot.  </p>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><a name="line-1"></a><span class="n">productFlavors</span> <span class="o">{</span>
+<a name="line-2"></a>    <span class="n">dev</span> <span class="o">{</span>
+<a name="line-3"></a>        <span class="n">multiDexEnabled</span> <span class="kc">true</span>
+<a name="line-4"></a>        <span class="n">minSdkVersion</span> <span class="mi">21</span>
+<a name="line-5"></a>    <span class="o">}</span>
+<a name="line-6"></a>    <span class="n">prod</span> <span class="o">{</span>
+<a name="line-7"></a>        <span class="n">multiDexEnabled</span> <span class="kc">true</span>
+<a name="line-8"></a>        <span class="n">minSdkVersion</span> <span class="mi">15</span>
+<a name="line-9"></a>    <span class="o">}</span>
+<a name="line-10"></a><span class="o">}</span>
+</code></pre></div>
+<p>And also keep in mind that <strong>Instant Run</strong> has <a href="https://twitter.com/tornorbye/status/717446584284241921">some overhead</a> on the dex method count in your debug builds, which might just make your method count go over the limit.</p>
+
+<p>On my machine for my project 
+<code>./gradlew :app:assembleProdDebug</code> takes <strong>55.623s</strong> and <code>./gradlew :app:assembleDevDebug</code> takes <strong>12.41s</strong>!</p>
+
+<p>So yeah. Do it.</p>
+
+<h4>Use a Daemon</h4>
+
+<p>Using a daemon essentially means, gradle keeps a JVM and gradle instance running after the first build and reuses the same for subsequent builds. Android Studio <strong>already uses a daemon</strong> for every build that is triggered from the IDE, but this is very useful for builds triggered from the command line.</p>
+
+<p><strong>Dry Run</strong> without daemon</p>
+<div class="highlight"><pre><code class="language-sh" data-lang="sh"><a name="line-1"></a>./gradlew :app:assembleDebug --dry-run
+</code></pre></div>
+<p>Output:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>BUILD SUCCESSFUL
+<a name="line-2"></a>
+<a name="line-3"></a>Total time: 11.657 secs
+<a name="line-4"></a>
+<a name="line-5"></a>This build could be faster, please consider using the Gradle Daemon: https://docs.gradle.org/2.10/userguide/gradle_daemon.html
+</code></pre></div>
+<h4>Enabling gradle daemon</h4>
+
+<p>In your <code>~/.gradle/gradle.properties</code></p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>org.gradle.daemon=true
+</code></pre></div>
+<p><strong>Dry Run output after enabling daemon</strong></p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>BUILD SUCCESSFUL
+<a name="line-2"></a>
+<a name="line-3"></a>Total time: 1.757 secs
+</code></pre></div>
+<h4>Upgradle your gradle version</h4>
+
+<p>The gradle team is constantly optimising the build performance and it is wise to be using the latest version for the best performance. Here is how you change it<br>
+In <code>&lt;Project Root&gt;/gradle/wrapper/</code><br>
+Edit <code>gradle-wrapper.properties</code> and upgrade gradle <code>distributionUrl</code> to the <a href="http://gradle.org/gradle-download/">latest</a>.</p>
+
+<blockquote>
+<p>The difference will be substantially good if you are upgrading from or below <code>2.4</code></p>
+</blockquote>
+
+<h4>Use JDK 8</h4>
+
+<p>Groovy, being a dynamic language, can really benifit from the <code>invoke dynamic</code> instruction in Java 7 and above. So using JDK7 or JDK8 will certainly be helpful.</p>
+
+<ul>
+<li>Download and install <a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">JDK 8</a></li>
+<li><code>Cmd+Shift+A</code> or <code>Ctrl+Shift+A</code>, type <code>Project Structure</code> and change <code>JDK Location</code> to JDK 8 location</li>
+</ul>
+
+<h4>Parallel Execution</h4>
+
+<p>If you have modules that are standalone, you can improve the build time a bit by enabling parallel execution.<br>
+In your <code>./gradle/gradle.properties</code> or <code>&lt;Project Root&gt;/gradle.properties</code>, add this line</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>org.gradle.parallel=true
+</code></pre></div>
+<h2>Common Pitfalls</h2>
+
+<h4>Dynamic dependencies</h4>
+
+<p>Use definite version numbers for your dependencies in your gradle</p>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><a name="line-1"></a><span class="c1">//Do NOT do this</span>
+<a name="line-2"></a><span class="n">compile</span> <span class="s1">&#39;com.google.code.gson:gson:2.+&#39;</span>
+<a name="line-3"></a>
+<a name="line-4"></a><span class="c1">//Do this instead</span>
+<a name="line-5"></a><span class="n">compile</span> <span class="s1">&#39;com.google.code.gson:gson:2.3&#39;</span>
+</code></pre></div>
+<p>This avoids the problem of gradle always making a network request to check for the latest version of the dependency</p>
+
+<h4>Avoid heavy computation</h4>
+
+<p>You can find snippets like this on stack overflow that aim to make versioning easier for you</p>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><a name="line-1"></a><span class="kt">def</span> <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;git rev-list HEAD --first-parent --count&#39;</span>
+<a name="line-2"></a><span class="kt">def</span> <span class="n">gitVersion</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="na">execute</span><span class="o">().</span><span class="na">text</span><span class="o">.</span><span class="na">trim</span><span class="o">().</span><span class="na">toInteger</span><span class="o">()</span>
+<a name="line-3"></a>
+<a name="line-4"></a><span class="n">android</span> <span class="o">{</span>
+<a name="line-5"></a>  <span class="n">defaultConfig</span> <span class="o">{</span>
+<a name="line-6"></a>    <span class="n">versionCode</span> <span class="n">gitVersion</span>
+<a name="line-7"></a>  <span class="o">}</span>
+<a name="line-8"></a><span class="o">}</span>
+</code></pre></div>
+<p>The problem with this code is - gradle needs to count the number of commits for every build. For a large repo which has around <code>20000</code> commits, it takes around <strong>half a second</strong> to just count the number of commits.</p>
+
+<h4>That&#39;s it</h4>
+
+<p>After these optimisations your first build might take the same amount of time, but trust me your <strong>subsequent builds will be much faster</strong> overall. </p>
+
+<p>Also there is one more very important optimisation you can do</p>
+
+<h4>Get an SSD</h4>
+
+<p>Please do.</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>RxConfusions - Part 1 : Map and FlatMap</title>
+	  <link>/RxConfusions-1-Map-and-FlatMap</link>
+	  <author>Manideep Polireddi</author>
+	  <pubDate>2015-12-02T01:40:00+05:30</pubDate>
+	  <guid>/RxConfusions-1-Map-and-FlatMap</guid>
+	  <description><![CDATA[
+	     <p>If you don&#39;t know what RxJava is or you aren&#39;t comfortable with the terms <code>Observable</code>, <code>Observer</code>, <code>Operator</code> and <code>Subscriber</code>, I suggest you have a look at <a href="http://blog.danlew.net/2014/09/15/grokking-rxjava-part-1/">Grokking RxJava</a> series by <a href="https://twitter.com/danlew42">Dan Lew</a>. </p>
+
+<p>If you have surfed through some RxJava content on the web, you should have come accross the <code>map()</code> operator. It is exactly what you think it is. But you might have seen people using the <code>flatMap()</code> operator in similar senarios which might have confused you a bit. Let&#39;s use them both in a small example and observe the effects of these operators.</p>
+
+<p>Let&#39;s use this simple <code>Observer</code> for logging</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><a name="line-1"></a><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCompleted</span><span class="o">()</span> <span class="o">{</span>
+<a name="line-2"></a>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;onCompleted&quot;</span><span class="o">);</span>
+<a name="line-3"></a><span class="o">}</span>
+<a name="line-4"></a>
+<a name="line-5"></a><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onError</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+<a name="line-6"></a>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">printf</span><span class="o">(</span><span class="s">&quot;onError: %s\n&quot;</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+<a name="line-7"></a><span class="o">}</span>
+<a name="line-8"></a>
+<a name="line-9"></a><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onNext</span><span class="o">(</span><span class="n">String</span> <span class="n">s</span><span class="o">)</span> <span class="o">{</span>
+<a name="line-10"></a>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">printf</span><span class="o">(</span><span class="s">&quot;onNext: %s\n&quot;</span><span class="o">,</span> <span class="n">s</span><span class="o">);</span>
+<a name="line-11"></a><span class="o">}</span>
+</code></pre></div>
+<h4>Simple use of map operator</h4>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><a name="line-1"></a><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+<a name="line-2"></a>    <span class="n">Printer</span> <span class="n">printer</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Printer</span><span class="o">();</span>
+<a name="line-3"></a>    <span class="n">String</span><span class="o">[]</span> <span class="n">names</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]</span> <span class="o">{</span><span class="s">&quot;John&quot;</span><span class="o">,</span> <span class="s">&quot;Samuel&quot;</span><span class="o">,</span> <span class="s">&quot;Micheal&quot;</span><span class="o">,</span> <span class="s">&quot;Tom&quot;</span><span class="o">};</span>
+<a name="line-4"></a>    <span class="n">printer</span><span class="o">.</span><span class="na">printTitlesUsingMap</span><span class="o">(</span><span class="n">names</span><span class="o">);</span>
+<a name="line-5"></a><span class="o">}</span>
+<a name="line-6"></a>
+<a name="line-7"></a><span class="kd">private</span> <span class="kt">void</span> <span class="nf">printTitlesUsingMap</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">names</span><span class="o">)</span> <span class="o">{</span>
+<a name="line-8"></a>    <span class="n">Observable</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">names</span><span class="o">)</span>
+<a name="line-9"></a>            <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="nl">Printer:</span><span class="o">:</span><span class="n">getTitle</span><span class="o">)</span>
+<a name="line-10"></a>            <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+<a name="line-11"></a><span class="o">}</span>
+<a name="line-12"></a>
+<a name="line-13"></a><span class="kd">private</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getTitle</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+<a name="line-14"></a>    <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;%s - %d&quot;</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="n">name</span><span class="o">.</span><span class="na">length</span><span class="o">());</span>
+<a name="line-15"></a><span class="o">}</span>
+</code></pre></div>
+<p>Output :</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>onNext: John - 4
+<a name="line-2"></a>onNext: Micheal - 7
+<a name="line-3"></a>onNext: Tom - 3
+<a name="line-4"></a>onNext: Samuel - 6
+<a name="line-5"></a>onCompleted
+</code></pre></div>
+<p>Lets make it a little interesting</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java">  <span class="kd">private</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getTitle</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IllegalArgumentException</span><span class="o">{</span>
+<span class="hll">      <span class="k">if</span><span class="o">(</span><span class="s">&quot;Micheal&quot;</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">name</span><span class="o">))</span> <span class="o">{</span>
+</span><span class="hll">          <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">&quot;Too many Micheals&quot;</span><span class="o">);</span>
+</span><span class="hll">      <span class="o">}</span>
+</span>      <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;%s - %d&quot;</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="n">name</span><span class="o">.</span><span class="na">length</span><span class="o">());</span>
+  <span class="o">}</span>
+</code></pre></div>
+<p>Output :</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>onNext: John - 4
+<a name="line-2"></a>onNext: Samuel - 6
+<a name="line-3"></a>onError: java.lang.IllegalArgumentException: Too many Micheals
+</code></pre></div>
+<p>Even though there are too many Micheals, you don&#39;t want to stop printing once a Micheal arrives. You might be thinking lets use <code>filter()</code> to filter out <code>Micheal</code> but let us assume the printer doesn&#39;t know when <code>getTitle()</code> fails. Operators like <code>map()</code> can&#39;t change the flow items, they just modify the items which are emitted. This is when operators like <code>flatMap()</code> come in handly</p>
+
+<h4>Enter the FlatMap</h4>
+<div class="highlight"><pre><code class="language-java" data-lang="java">  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">printTitlesUsingFlatMap</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">names</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">Observable</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">names</span><span class="o">)</span>
+              <span class="o">.</span><span class="na">flatMap</span><span class="o">(</span><span class="nl">Printer:</span><span class="o">:</span><span class="n">getTitleObservable</span><span class="o">)</span>
+              <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+  <span class="o">}</span>
+
+  <span class="kd">private</span> <span class="kd">static</span> <span class="n">Observable</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="nf">getTitleObservable</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="n">Observable</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">subscriber</span> <span class="o">-&gt;</span> <span class="o">{</span>
+          <span class="k">if</span><span class="o">(!</span><span class="n">subscriber</span><span class="o">.</span><span class="na">isUnsubscribed</span><span class="o">())</span> <span class="o">{</span>
+<span class="hll">              <span class="k">try</span> <span class="o">{</span>
+</span><span class="hll">                  <span class="n">subscriber</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">getTitle</span><span class="o">(</span><span class="n">name</span><span class="o">));</span>
+</span><span class="hll">              <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IllegalArgumentException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="hll">                  <span class="c1">//do nothing</span>
+</span><span class="hll">              <span class="o">}</span>
+</span><span class="hll">              <span class="n">subscriber</span><span class="o">.</span><span class="na">onCompleted</span><span class="o">();</span>
+</span>          <span class="o">}</span>
+      <span class="o">});</span>
+  <span class="o">}</span>
+</code></pre></div>
+<p>Notice that we are calling <code>subscriber.onComplete()</code> for every name. Guess the output... guessed it? Now have a look<br>
+Output :</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>onNext: John - 4
+<a name="line-2"></a>onNext: Samuel - 6
+<a name="line-3"></a>onNext: Tom - 3
+<a name="line-4"></a>onCompleted
+</code></pre></div>
+<p>Is that what you expected? Probably not. Now have a look at what happens if don&#39;t call <code>subscriber.onComplete()</code> when there is an exception.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java">  <span class="k">return</span> <span class="n">Observable</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">subscriber</span> <span class="o">-&gt;</span> <span class="o">{</span>
+      <span class="k">if</span><span class="o">(!</span><span class="n">subscriber</span><span class="o">.</span><span class="na">isUnsubscribed</span><span class="o">())</span> <span class="o">{</span>
+          <span class="k">try</span> <span class="o">{</span>
+              <span class="n">subscriber</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">getTitle</span><span class="o">(</span><span class="n">name</span><span class="o">));</span>
+<span class="hll">              <span class="n">subscriber</span><span class="o">.</span><span class="na">onCompleted</span><span class="o">();</span>
+</span>          <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IllegalArgumentException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+              <span class="c1">//do nothing</span>
+          <span class="o">}</span>
+      <span class="o">}</span>
+  <span class="o">});</span>
+</code></pre></div>
+<p>Make a guess before you look at the output.</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>onNext: John - 4
+<a name="line-2"></a>onNext: Samuel - 6
+<a name="line-3"></a>onNext: Tom - 3
+</code></pre></div>
+<p>No <code>onComplete()</code> at all.<br>
+Now make a guess who is the <code>subscriber</code> to our <code>getTitleObservable()</code> function.  </p>
+
+<blockquote>
+<p>The <code>flatMap()</code> operator is our subscriber  </p>
+</blockquote>
+
+<p>If you are thiking - &#39;Wait, <code>flatMap()</code> is an <em>Operator</em> not a <em>Subscriber</em>&#39;, you should watch <a href="https://vimeo.com/144812843">Demistifying RxJava Subscribers</a> by <a href="https://twitter.com/JakeWharton">Jake Wharton</a>. Basically, <strong>everything</strong> is a subscriber.</p>
+
+<p><em>FlatMap</em> collects all the observables returned for each item in the stream and emits all the items emitted by those observables. Simply put, it is a <a href="https://github.com/ReactiveX/RxJava/blob/1.x/src/main/java/rx/Observable.java#L5204">merge of all observables returned by your mapping function</a>. 
+It calls <code>onComplete()</code> only when all the observables are <em>completed</em>.  </p>
+
+<p>In this example <code>getTitleObservale(&quot;Micheal&quot;)</code> wasn&#39;t completed. So <strong>FlatMap is waiting</strong> for it to complete(Yes, it is in the memory).</p>
+
+<p>Visualise what happened in the above example. Now think about the <code>map()</code> operator. If you feel like - &#39;They are two very different operators&#39;, then I have done my job. If you don&#39;t, <a href="https://twitter.com/okmanideep">try confusing me as well</a>.</p>
+
+<p>I am no expert in this topic. Just sharing as I learn. Please <a href="https://twitter.com/okmanideep">drop me a tweet</a> or a comment if I got anything wrong. And share it to people who you think will find this useful.</p>
+
+<h3>EDIT</h3>
+
+<p><a href="http://artemzin.com/blog/rxjava-defer-execution-of-function-via-fromcallable/">Artem Zinnatullin</a>&#39;s post suggests a better way to for our getTitleObservable().</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><a name="line-1"></a><span class="k">return</span> <span class="n">Observable</span><span class="o">.</span><span class="na">fromCallable</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">getTitle</span><span class="o">(</span><span class="n">name</span><span class="o">));</span>
+</code></pre></div>
+<p>By using this method, you don&#39;t need to worry about calling the right functions to the subscriber. Thanks to <a href="https://www.reddit.com/r/androiddev/comments/3u5w0c/if_you_are_writing_observablecreate_theres_a_big/">pakoito</a> for pointing that out.</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>Better code blocks in Jekyll</title>
+	  <link>/better-code-blocks-in-jekyll</link>
+	  <author>Manideep Polireddi</author>
+	  <pubDate>2015-11-24T01:40:00+05:30</pubDate>
+	  <guid>/better-code-blocks-in-jekyll</guid>
+	  <description><![CDATA[
+	     <p>If you are blogging a lot of code, it makes a huge difference if you style your code blocks well. If you are using some Jekyll theme, chances are the default output is not so pleasing. If you are not much familiar with <code>Jekyll</code> or <code>Pygments</code>, trust me it would take a lot of time to get what you want by just searching the web. I have gathered  all the scattered suggestions I found and arranged them into this post. Let&#39;s make your code look better</p>
+
+<h2>Setting up pygments</h2>
+
+<p>In <code>_config.yml</code></p>
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><a name="line-1"></a><span class="ss">markdown</span><span class="p">:</span> <span class="n">redcarpet</span>
+<a name="line-2"></a><span class="ss">redcarpet</span><span class="p">:</span>
+<a name="line-3"></a>    <span class="ss">extension</span><span class="p">:</span>
+<a name="line-4"></a>        <span class="o">-</span> <span class="n">fenced_code_blocks</span>
+<a name="line-5"></a><span class="ss">highlighter</span><span class="p">:</span> <span class="n">pygments</span>
+<a name="line-6"></a><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+<a name="line-7"></a><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</code></pre></div>
+<p>This sets <code>redcarpet</code> as our markdown parser and <code>pygments</code> as our code highlighter.<br>
+And <code>fenced_code_blocks</code> extension enables you to write code blocks like in Github flavoured markdown using ```  </p>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text"><a name="True-1"></a>```css
+<a name="True-2"></a>.left {float: left;}
+<a name="True-3"></a>
+<a name="True-4"></a>.right {float: right;}
+<a name="True-5"></a>```</code></pre></figure>
+
+<h2>Syntax highlighting</h2>
+
+<p>By now your code probably looks like this</p>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">  .left {float: left;}
+  
+  .right {float: right;}</code></pre></figure>
+
+<p>Just like plain text and no syntax highlighting based on the language you specified. But if you look at source you can see that <code>pygments</code> has analysed the code as css and added some classes to different parts of the code. All we need to do is add some css to those classes.</p>
+
+<p>I have written a <a href="https://gist.github.com/okmanideep/aa0890c6da9104e16a7a">github like color scheme</a>. You can find other styles online for <a href="https://www.google.co.in/search?q=pygments+syntax+highlighting+css">pygments syntax highlighting css</a>.</p>
+
+<p>After adding the sytax highlighting css your code should look like this</p>
+
+<figure class="highlight"><pre><code class="language-css" data-lang="css">  <span class="nc">.left</span> <span class="p">{</span><span class="k">float</span><span class="o">:</span> <span class="k">left</span><span class="p">;}</span>
+  
+  <span class="nc">.right</span> <span class="p">{</span><span class="k">float</span><span class="o">:</span> <span class="k">right</span><span class="p">;}</span></code></pre></figure>
+
+<h2>Line Numbers</h2>
+
+<p>As mentioned by <a href="https://drewsilcock.co.uk/proper-linenumbers/">Drew Silcock</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters">CSS Counters</a> is the best way to add line numbers to your code blocks. Add css counters to your <code>pre</code> blocks using <a href="https://gist.github.com/okmanideep/55419a959b7fd39a1c89">jekyll-pygments-line-numbers.css</a>.</p>
+
+<p>To use this technique we should tell pygments to generate <code>lineanchors</code> for the code blocks. We can do this by using liquid template tags for our code blocks</p>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text"><a name="True-1"></a>{% highlight css %}
+<a name="True-2"></a>.left {float: left;}
+<a name="True-3"></a>
+<a name="True-4"></a>.right {float: right;}
+<a name="True-5"></a>{% endhighlight %}</code></pre></figure>
+
+<p>But we want to write our code block using ```<code>css</code>. We can do this by adding a custom redcarpet parser. Add this <code>redcarpet-custom.rb</code> file to your <code>_plugins</code> folder</p>
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><a name="line-1"></a><span class="k">module</span> <span class="nn">Jekyll</span>
+<a name="line-2"></a>  <span class="k">module</span> <span class="nn">Converters</span>
+<a name="line-3"></a>    <span class="k">class</span> <span class="nc">Markdown</span>
+<a name="line-4"></a>      <span class="k">class</span> <span class="nc">RedcarpetParser</span>
+<a name="line-5"></a>        <span class="k">module</span> <span class="nn">WithPygments</span>
+<a name="line-6"></a>          <span class="kp">include</span> <span class="no">CommonMethods</span>
+<a name="line-7"></a>          <span class="k">def</span> <span class="nf">block_code</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+<a name="line-8"></a>            <span class="nb">require</span> <span class="s1">&#39;pygments&#39;</span>
+<a name="line-9"></a>            <span class="n">lang</span> <span class="o">=</span> <span class="n">lang</span> <span class="o">&amp;&amp;</span> <span class="n">lang</span><span class="o">.</span><span class="n">split</span><span class="o">.</span><span class="n">first</span> <span class="o">||</span> <span class="s2">&quot;text&quot;</span>
+<a name="line-10"></a>            <span class="n">output</span> <span class="o">=</span> <span class="n">add_code_tags</span><span class="p">(</span>
+<a name="line-11"></a>              <span class="no">Pygments</span><span class="o">.</span><span class="n">highlight</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="ss">:lexer</span> <span class="o">=&gt;</span> <span class="n">lang</span><span class="p">,</span>
+<a name="line-12"></a>                                 <span class="ss">:options</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:encoding</span> <span class="o">=&gt;</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="ss">:lineanchors</span> <span class="o">=&gt;</span><span class="s1">&#39;line&#39;</span> <span class="p">}),</span>
+<a name="line-13"></a>              <span class="n">lang</span>
+<a name="line-14"></a>            <span class="p">)</span>
+<a name="line-15"></a>          <span class="k">end</span>
+<a name="line-16"></a>        <span class="k">end</span>
+<a name="line-17"></a>      <span class="k">end</span>
+<a name="line-18"></a>    <span class="k">end</span>
+<a name="line-19"></a>  <span class="k">end</span>
+<a name="line-20"></a><span class="k">end</span>
+</code></pre></div>
+<p>You can add as many <a href="http://pygments.org/docs/formatters/">Pygment options</a> to the <code>:options =&gt; { ... }</code> hash. The above ovverrides the <a href="https://github.com/jekyll/jekyll/blob/master/lib/jekyll/converters/markdown/redcarpet_parser.rb">WithPygments module</a> of the redcarpet parser.</p>
+
+<p>After this your code blocks should look like</p>
+<div class="highlight"><pre><code class="language-css" data-lang="css"><a name="line-1"></a><span class="nc">.left</span> <span class="p">{</span><span class="k">float</span><span class="o">:</span> <span class="k">left</span><span class="p">;}</span>
+<a name="line-2"></a>
+<a name="line-3"></a><span class="nc">.right</span> <span class="p">{</span><span class="k">float</span><span class="o">:</span> <span class="k">right</span><span class="p">;}</span>
+</code></pre></div>
+<h2>Line highlighting</h2>
+
+<p>...</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>Clean way to define support library dependencies</title>
+	  <link>/clean-way-to-define-support-library-dependencies</link>
+	  <author>Manideep Polireddi</author>
+	  <pubDate>2015-11-24T01:40:00+05:30</pubDate>
+	  <guid>/clean-way-to-define-support-library-dependencies</guid>
+	  <description><![CDATA[
+	     <p>As the support library started getting bigger with more tools in it, the team at google have suggested developers to pick and choose the individual pieces of the library in their dependencies. More recently our <code>build.gradle</code> files started to look like this</p>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><a name="line-1"></a><span class="n">dependencies</span> <span class="o">{</span>
+<a name="line-2"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:appcompat-v7:23.1.0&#39;</span>
+<a name="line-3"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:design:23.1.0&#39;</span>
+<a name="line-4"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:pallete-v7:23.1.0&#39;</span>
+<a name="line-5"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:cardview-v7:23.1.0&#39;</span>
+<a name="line-6"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:recyclerview-v7:23.1.0&#39;</span>
+<a name="line-7"></a><span class="o">}</span>
+</code></pre></div>
+<p>So when a new release comes out, we have to change the version number in every single line. Chris Banes, from the Android developer relations team, in <a href="https://www.youtube.com/watch?v=ihQ16K8gSuQ&amp;t=17m58s">Android Dev Summit 2015</a> has given this great tip to solve this problem.</p>
+
+<blockquote class="twitter-tweet" lang="en"><p lang="en" dir="ltr">This! <a href="https://twitter.com/hashtag/AndroidDev?src=hash">#AndroidDev</a> <a href="https://twitter.com/hashtag/AndroidDevSummit?src=hash">#AndroidDevSummit</a>&#10;🙏 <a href="https://twitter.com/chrisbanes">@chrisbanes</a> <a href="https://t.co/v47Pm74ohj">pic.twitter.com/v47Pm74ohj</a></p>&mdash; Manideep Polireddi (@okmanideep) <a href="https://twitter.com/okmanideep/status/669195097947377664">November 24, 2015</a></blockquote>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>Great! But there is a small <strong>catch</strong> here  </p>
+
+<p><code>compile &#39;com.android.support:appcompat-v7:${supportLibVersion}&#39;</code> <strong>doesn&#39;t work</strong><br>
+<code>compile &quot;com.android.support:appcompat-v7:${supportLibVersion}&quot;</code> <strong>WORKS!!!</strong>  </p>
+
+<p>If you haven&#39;t noticed yet, you should use <strong>double quotes</strong></p>
+
+<p>So the final code looks like this</p>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><a name="line-1"></a><span class="n">ext</span> <span class="o">{</span>
+<a name="line-2"></a>    <span class="n">supportLibVersion</span> <span class="o">=</span> <span class="s1">&#39;23.1.1&#39;</span>
+<a name="line-3"></a><span class="o">}</span>
+<a name="line-4"></a>
+<a name="line-5"></a><span class="n">dependencies</span> <span class="o">{</span>
+<a name="line-6"></a>    <span class="n">compile</span> <span class="s2">&quot;com.android.support:appcompat-v7:${supportLibVersion}&quot;</span>
+<a name="line-7"></a>    <span class="n">compile</span> <span class="s2">&quot;com.android.support:design:${supportLibVersion}&quot;</span>
+<a name="line-8"></a>    <span class="n">compile</span> <span class="s2">&quot;com.android.support:pallete-v7:${supportLibVersion}&quot;</span>
+<a name="line-9"></a>    <span class="n">compile</span> <span class="s2">&quot;com.android.support:cardview-v7:${supportLibVersion}&quot;</span>
+<a name="line-10"></a>    <span class="n">compile</span> <span class="s2">&quot;com.android.support:recyclerview-v7:${supportLibVersion}&quot;</span>
+<a name="line-11"></a><span class="o">}</span>
+</code></pre></div>
+<p>By the way, Android Studio is intelligent enough that it will suggest you to update the version when there is a new one out, even in the above format. All hail IntelliJ.</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>Permissions in marshmallow</title>
+	  <link>/permissions-in-marshmallow</link>
+	  <author>Manideep Polireddi</author>
+	  <pubDate>2015-11-15T01:40:00+05:30</pubDate>
+	  <guid>/permissions-in-marshmallow</guid>
+	  <description><![CDATA[
+	     <p>I expect you to first go and have a look at this page in the <a href="http://developer.android.com/training/permissions/requesting.html">Android Bible</a> about permissions in marshmallow. Especially have a look at how to:</p>
+
+<ul>
+<li>Request the permissions you need</li>
+<li>Handle the permissions request response</li>
+</ul>
+
+<h4>Requesting for permission</h4>
+
+<p>You might have seen a code snippet like below in the training page.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><a name="line-1"></a><span class="c1">// Here, thisActivity is the current activity</span>
+<a name="line-2"></a><span class="k">if</span> <span class="o">(</span><span class="n">ContextCompat</span><span class="o">.</span><span class="na">checkSelfPermission</span><span class="o">(</span><span class="n">thisActivity</span><span class="o">,</span>
+<a name="line-3"></a>                <span class="n">Manifest</span><span class="o">.</span><span class="na">permission</span><span class="o">.</span><span class="na">READ_CONTACTS</span><span class="o">)</span>
+<a name="line-4"></a>        <span class="o">!=</span> <span class="n">PackageManager</span><span class="o">.</span><span class="na">PERMISSION_GRANTED</span><span class="o">)</span> <span class="o">{</span>
+<a name="line-5"></a>    <span class="c1">// Should we show an explanation?</span>
+<a name="line-6"></a>    <span class="k">if</span> <span class="o">(</span><span class="n">ActivityCompat</span><span class="o">.</span><span class="na">shouldShowRequestPermissionRationale</span><span class="o">(</span><span class="n">thisActivity</span><span class="o">,</span>
+<a name="line-7"></a>            <span class="n">Manifest</span><span class="o">.</span><span class="na">permission</span><span class="o">.</span><span class="na">READ_CONTACTS</span><span class="o">))</span> <span class="o">{</span>
+<a name="line-8"></a>        <span class="c1">//show user the reason for permission</span>
+<a name="line-9"></a>    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+<a name="line-10"></a>        <span class="c1">//request permission</span>
+<a name="line-11"></a>    <span class="o">}</span>
+<a name="line-12"></a><span class="o">}</span>
+</code></pre></div>
+<h3>Pay Attention</h3>
+
+<p>Lets just dive into the only tricky part here - <code>shouldShowRequestPermissionRationale()</code> returns</p>
+
+<ul>
+<li><strong>true</strong> if 
+
+<ul>
+<li>The app has requested this permission previously and the user denied the request <strong>in the dialog</strong></li>
+<li>User has toggled off the permission <strong>in the settings</strong> (<em>Even if the app hasn&#39;t requested the permission yet, if the user just has toggled the switch on and off in the settings page, you are expected to show the rationale</em>)</li>
+</ul></li>
+<li><strong>false</strong> if
+
+<ul>
+<li>The app didn&#39;t request for this permission yet</li>
+<li>The user denied the permission and chose <strong>Don&#39;t ask again</strong> option</li>
+<li>The device policy prohibits the app from having that permission (<em>Mostly in enterprise cenarios</em>)</li>
+</ul></li>
+</ul>
+
+<h3>Consider this possible case</h3>
+
+<p>The above code works pretty much in most practical cases. Let us consider this case:</p>
+
+<ul>
+<li>The user has chosen <strong>Don&#39;t ask again</strong> for contacts access in the past (<em>which will most probably never happen if you have requested permissions gracefully and if the user made the decision conciously</em>) </li>
+<li>And now the user wants to send a contact to his friend </li>
+</ul>
+
+<p>There is no way to detect using the above code that we were denied the permission, and ask him to grant the permission via application settings.</p>
+
+<h3>The way out</h3>
+
+<p>Check for <code>shouldShowRequestPermissionRationale()</code> before and after asking permission. If it returns false both the times then the user chose &#39;Don&#39;t ask again&#39; in the past or the device policy doesn&#39;t allow for that permission.</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java">  <span class="kt">boolean</span> <span class="n">before</span><span class="o">,</span> <span class="n">after</span><span class="o">;</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">requestContactsPermission</span><span class="o">()</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">ContextCompat</span><span class="o">.</span><span class="na">checkSelfPermission</span><span class="o">(</span><span class="n">thisActivity</span><span class="o">,</span>
+                      <span class="n">Manifest</span><span class="o">.</span><span class="na">permission</span><span class="o">.</span><span class="na">READ_CONTACTS</span><span class="o">)</span>
+              <span class="o">!=</span> <span class="n">PackageManager</span><span class="o">.</span><span class="na">PERMISSION_GRANTED</span><span class="o">)</span> <span class="o">{</span>
+          <span class="c1">// Should we show an explanation?</span>
+<span class="hll">          <span class="n">before</span> <span class="o">=</span> <span class="n">ActivityCompat</span><span class="o">.</span><span class="na">shouldShowRequestPermissionRationale</span><span class="o">(</span><span class="n">thisActivity</span><span class="o">,</span>
+</span><span class="hll">                  <span class="n">Manifest</span><span class="o">.</span><span class="na">permission</span><span class="o">.</span><span class="na">READ_CONTACTS</span><span class="o">);</span>
+</span><span class="hll">          <span class="k">if</span> <span class="o">(</span><span class="n">before</span><span class="o">)</span> <span class="o">{</span>
+</span>              <span class="c1">//show user the reason for permission</span>
+          <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+              <span class="c1">//request permission</span>
+          <span class="o">}</span>
+      <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onRequestPermissionsResult</span><span class="o">(</span><span class="kt">int</span> <span class="n">requestCode</span><span class="o">,</span>
+          <span class="n">String</span> <span class="n">permissions</span><span class="o">[],</span> <span class="kt">int</span><span class="o">[]</span> <span class="n">grantResults</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">switch</span> <span class="o">(</span><span class="n">requestCode</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">case</span> <span class="nl">MY_PERMISSIONS_REQUEST_READ_CONTACTS:</span> <span class="o">{</span>
+              <span class="k">if</span> <span class="o">(</span><span class="n">grantResults</span><span class="o">.</span><span class="na">length</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                  <span class="o">&amp;&amp;</span> <span class="n">grantResults</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">==</span> <span class="n">PackageManager</span><span class="o">.</span><span class="na">PERMISSION_GRANTED</span><span class="o">)</span> <span class="o">{</span>
+                  <span class="c1">// permission was granted, yay! Do the</span>
+                  <span class="c1">// contacts-related task you need to do.</span>
+              <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+<span class="hll">                  <span class="n">after</span> <span class="o">=</span> <span class="n">ActivityCompat</span><span class="o">.</span><span class="na">shouldShowRequestPermissionRationale</span><span class="o">(</span>
+</span><span class="hll">                  <span class="n">thisActivity</span><span class="o">,</span>
+</span><span class="hll">                  <span class="n">Manifest</span><span class="o">.</span><span class="na">permission</span><span class="o">.</span><span class="na">READ_CONTACTS</span><span class="o">);</span>
+</span><span class="hll">                  <span class="kt">boolean</span> <span class="n">goToSettings</span> <span class="o">=</span> <span class="o">!(</span><span class="n">after</span> <span class="o">||</span> <span class="n">before</span><span class="o">);</span>
+</span><span class="hll">                  <span class="n">showRationale</span><span class="o">(</span><span class="n">goToSettings</span><span class="o">);</span>
+</span>              <span class="o">}</span>
+              <span class="k">return</span><span class="o">;</span>
+          <span class="o">}</span>
+      <span class="o">}</span>
+  <span class="o">}</span>
+</code></pre></div>
+<p>If both <code>before</code> and <code>after</code> are <code>false</code>, then show the user a dialog explaining that we need the contacts permission with a &#39;GO TO SETTINGS&#39; button. On click take him to your application in the settings like this :</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><a name="line-1"></a><span class="kd">private</span> <span class="kt">void</span> <span class="nf">goToSettings</span><span class="o">()</span> <span class="o">{</span>
+<a name="line-2"></a>    <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Intent</span><span class="o">();</span>
+<a name="line-3"></a>    <span class="n">intent</span><span class="o">.</span><span class="na">setAction</span><span class="o">(</span><span class="n">Settings</span><span class="o">.</span><span class="na">ACTION_APPLICATION_DETAILS_SETTINGS</span><span class="o">);</span>
+<a name="line-4"></a>    <span class="n">Uri</span> <span class="n">uri</span> <span class="o">=</span> <span class="n">Uri</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">&quot;package:&quot;</span> <span class="o">+</span> <span class="n">getPackageName</span><span class="o">());</span>
+<a name="line-5"></a>    <span class="n">intent</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="n">uri</span><span class="o">);</span>
+<a name="line-6"></a>    <span class="n">startActivity</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
+<a name="line-7"></a><span class="o">}</span>
+</code></pre></div>
+	  ]]></description>
+	</item>
+
+
+</channel>
+</rss>

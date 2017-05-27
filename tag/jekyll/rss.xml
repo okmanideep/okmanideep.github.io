@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+   
+      <title>okmanideep.github.io/</title>
+   
+   <link>https://okmanideep.github.io</link>
+   <description>Android · Development · Design</description>
+   <language>en-uk</language>
+   <managingEditor> Manideep Polireddi</managingEditor>
+   <atom:link href="rss" rel="self" type="application/rss+xml" />
+   
+	<item>
+	  <title>Better code blocks in Jekyll</title>
+	  <link>/better-code-blocks-in-jekyll</link>
+	  <author>Manideep Polireddi</author>
+	  <pubDate>2015-11-24T01:40:00+05:30</pubDate>
+	  <guid>/better-code-blocks-in-jekyll</guid>
+	  <description><![CDATA[
+	     <p>If you are blogging a lot of code, it makes a huge difference if you style your code blocks well. If you are using some Jekyll theme, chances are the default output is not so pleasing. If you are not much familiar with <code>Jekyll</code> or <code>Pygments</code>, trust me it would take a lot of time to get what you want by just searching the web. I have gathered  all the scattered suggestions I found and arranged them into this post. Let&#39;s make your code look better</p>
+
+<h2>Setting up pygments</h2>
+
+<p>In <code>_config.yml</code></p>
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><a name="line-1"></a><span class="ss">markdown</span><span class="p">:</span> <span class="n">redcarpet</span>
+<a name="line-2"></a><span class="ss">redcarpet</span><span class="p">:</span>
+<a name="line-3"></a>    <span class="ss">extension</span><span class="p">:</span>
+<a name="line-4"></a>        <span class="o">-</span> <span class="n">fenced_code_blocks</span>
+<a name="line-5"></a><span class="ss">highlighter</span><span class="p">:</span> <span class="n">pygments</span>
+<a name="line-6"></a><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+<a name="line-7"></a><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</code></pre></div>
+<p>This sets <code>redcarpet</code> as our markdown parser and <code>pygments</code> as our code highlighter.<br>
+And <code>fenced_code_blocks</code> extension enables you to write code blocks like in Github flavoured markdown using ```  </p>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text"><a name="True-1"></a>```css
+<a name="True-2"></a>.left {float: left;}
+<a name="True-3"></a>
+<a name="True-4"></a>.right {float: right;}
+<a name="True-5"></a>```</code></pre></figure>
+
+<h2>Syntax highlighting</h2>
+
+<p>By now your code probably looks like this</p>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">  .left {float: left;}
+  
+  .right {float: right;}</code></pre></figure>
+
+<p>Just like plain text and no syntax highlighting based on the language you specified. But if you look at source you can see that <code>pygments</code> has analysed the code as css and added some classes to different parts of the code. All we need to do is add some css to those classes.</p>
+
+<p>I have written a <a href="https://gist.github.com/okmanideep/aa0890c6da9104e16a7a">github like color scheme</a>. You can find other styles online for <a href="https://www.google.co.in/search?q=pygments+syntax+highlighting+css">pygments syntax highlighting css</a>.</p>
+
+<p>After adding the sytax highlighting css your code should look like this</p>
+
+<figure class="highlight"><pre><code class="language-css" data-lang="css">  <span class="nc">.left</span> <span class="p">{</span><span class="k">float</span><span class="o">:</span> <span class="k">left</span><span class="p">;}</span>
+  
+  <span class="nc">.right</span> <span class="p">{</span><span class="k">float</span><span class="o">:</span> <span class="k">right</span><span class="p">;}</span></code></pre></figure>
+
+<h2>Line Numbers</h2>
+
+<p>As mentioned by <a href="https://drewsilcock.co.uk/proper-linenumbers/">Drew Silcock</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters">CSS Counters</a> is the best way to add line numbers to your code blocks. Add css counters to your <code>pre</code> blocks using <a href="https://gist.github.com/okmanideep/55419a959b7fd39a1c89">jekyll-pygments-line-numbers.css</a>.</p>
+
+<p>To use this technique we should tell pygments to generate <code>lineanchors</code> for the code blocks. We can do this by using liquid template tags for our code blocks</p>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text"><a name="True-1"></a>{% highlight css %}
+<a name="True-2"></a>.left {float: left;}
+<a name="True-3"></a>
+<a name="True-4"></a>.right {float: right;}
+<a name="True-5"></a>{% endhighlight %}</code></pre></figure>
+
+<p>But we want to write our code block using ```<code>css</code>. We can do this by adding a custom redcarpet parser. Add this <code>redcarpet-custom.rb</code> file to your <code>_plugins</code> folder</p>
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><a name="line-1"></a><span class="k">module</span> <span class="nn">Jekyll</span>
+<a name="line-2"></a>  <span class="k">module</span> <span class="nn">Converters</span>
+<a name="line-3"></a>    <span class="k">class</span> <span class="nc">Markdown</span>
+<a name="line-4"></a>      <span class="k">class</span> <span class="nc">RedcarpetParser</span>
+<a name="line-5"></a>        <span class="k">module</span> <span class="nn">WithPygments</span>
+<a name="line-6"></a>          <span class="kp">include</span> <span class="no">CommonMethods</span>
+<a name="line-7"></a>          <span class="k">def</span> <span class="nf">block_code</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+<a name="line-8"></a>            <span class="nb">require</span> <span class="s1">&#39;pygments&#39;</span>
+<a name="line-9"></a>            <span class="n">lang</span> <span class="o">=</span> <span class="n">lang</span> <span class="o">&amp;&amp;</span> <span class="n">lang</span><span class="o">.</span><span class="n">split</span><span class="o">.</span><span class="n">first</span> <span class="o">||</span> <span class="s2">&quot;text&quot;</span>
+<a name="line-10"></a>            <span class="n">output</span> <span class="o">=</span> <span class="n">add_code_tags</span><span class="p">(</span>
+<a name="line-11"></a>              <span class="no">Pygments</span><span class="o">.</span><span class="n">highlight</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="ss">:lexer</span> <span class="o">=&gt;</span> <span class="n">lang</span><span class="p">,</span>
+<a name="line-12"></a>                                 <span class="ss">:options</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:encoding</span> <span class="o">=&gt;</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="ss">:lineanchors</span> <span class="o">=&gt;</span><span class="s1">&#39;line&#39;</span> <span class="p">}),</span>
+<a name="line-13"></a>              <span class="n">lang</span>
+<a name="line-14"></a>            <span class="p">)</span>
+<a name="line-15"></a>          <span class="k">end</span>
+<a name="line-16"></a>        <span class="k">end</span>
+<a name="line-17"></a>      <span class="k">end</span>
+<a name="line-18"></a>    <span class="k">end</span>
+<a name="line-19"></a>  <span class="k">end</span>
+<a name="line-20"></a><span class="k">end</span>
+</code></pre></div>
+<p>You can add as many <a href="http://pygments.org/docs/formatters/">Pygment options</a> to the <code>:options =&gt; { ... }</code> hash. The above ovverrides the <a href="https://github.com/jekyll/jekyll/blob/master/lib/jekyll/converters/markdown/redcarpet_parser.rb">WithPygments module</a> of the redcarpet parser.</p>
+
+<p>After this your code blocks should look like</p>
+<div class="highlight"><pre><code class="language-css" data-lang="css"><a name="line-1"></a><span class="nc">.left</span> <span class="p">{</span><span class="k">float</span><span class="o">:</span> <span class="k">left</span><span class="p">;}</span>
+<a name="line-2"></a>
+<a name="line-3"></a><span class="nc">.right</span> <span class="p">{</span><span class="k">float</span><span class="o">:</span> <span class="k">right</span><span class="p">;}</span>
+</code></pre></div>
+<h2>Line highlighting</h2>
+
+<p>...</p>
+
+	  ]]></description>
+	</item>
+
+
+</channel>
+</rss>

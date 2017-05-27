@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="https://okmanideep.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://okmanideep.github.io/" rel="alternate" type="text/html" /><updated>2017-05-27T20:54:56+05:30</updated><id>https://okmanideep.github.io/</id><title type="html">Blog | Manideep</title><subtitle>Android · Development · Design</subtitle><author><name>Manideep Polireddi</name></author><entry><title type="html">Improve your Android build times</title><link href="https://okmanideep.github.io/improve-android-build-times" rel="alternate" type="text/html" title="Improve your Android build times" /><published>2016-04-06T01:40:00+05:30</published><updated>2016-04-06T01:40:00+05:30</updated><id>https://okmanideep.github.io/improve-android-build-times</id><content type="html" xml:base="https://okmanideep.github.io/improve-android-build-times">&lt;p&gt;If you have the time to watch the video, go ahead. &lt;a href=&quot;https://twitter.com/madisp&quot;&gt;Madis Pink&lt;/a&gt; goes over each optimisation you can do very carefully and how you can profile the gradle build process to identify the bottlenecks of your builds. If not, go ahead do the changes mentioned below, which will take less than two minutes and enjoy a much smaller build times.&lt;/p&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/AbNhen_zn-c&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;
+
+&lt;h2&gt;Optimisations&lt;/h2&gt;
+
+&lt;h4&gt;The minSdk 21 trick&lt;/h4&gt;
+
+&lt;p&gt;It doesn&amp;#39;t matter your app is over the 65K method limit or not, enabling multiDex and having product flavors like this help a lot.  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-groovy&quot; data-lang=&quot;groovy&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;n&quot;&gt;productFlavors&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;dev&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;        &lt;span class=&quot;n&quot;&gt;multiDexEnabled&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;
+&lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;        &lt;span class=&quot;n&quot;&gt;minSdkVersion&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;21&lt;/span&gt;
+&lt;a name=&quot;line-5&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;a name=&quot;line-6&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;prod&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-7&quot;&gt;&lt;/a&gt;        &lt;span class=&quot;n&quot;&gt;multiDexEnabled&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;
+&lt;a name=&quot;line-8&quot;&gt;&lt;/a&gt;        &lt;span class=&quot;n&quot;&gt;minSdkVersion&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;
+&lt;a name=&quot;line-9&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;a name=&quot;line-10&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;And also keep in mind that &lt;strong&gt;Instant Run&lt;/strong&gt; has &lt;a href=&quot;https://twitter.com/tornorbye/status/717446584284241921&quot;&gt;some overhead&lt;/a&gt; on the dex method count in your debug builds, which might just make your method count go over the limit.&lt;/p&gt;
+
+&lt;p&gt;On my machine for my project 
+&lt;code&gt;./gradlew :app:assembleProdDebug&lt;/code&gt; takes &lt;strong&gt;55.623s&lt;/strong&gt; and &lt;code&gt;./gradlew :app:assembleDevDebug&lt;/code&gt; takes &lt;strong&gt;12.41s&lt;/strong&gt;!&lt;/p&gt;
+
+&lt;p&gt;So yeah. Do it.&lt;/p&gt;
+
+&lt;h4&gt;Use a Daemon&lt;/h4&gt;
+
+&lt;p&gt;Using a daemon essentially means, gradle keeps a JVM and gradle instance running after the first build and reuses the same for subsequent builds. Android Studio &lt;strong&gt;already uses a daemon&lt;/strong&gt; for every build that is triggered from the IDE, but this is very useful for builds triggered from the command line.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Dry Run&lt;/strong&gt; without daemon&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;./gradlew :app:assembleDebug --dry-run
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Output:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;BUILD SUCCESSFUL
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;Total time: 11.657 secs
+&lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;line-5&quot;&gt;&lt;/a&gt;This build could be faster, please consider using the Gradle Daemon: https://docs.gradle.org/2.10/userguide/gradle_daemon.html
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h4&gt;Enabling gradle daemon&lt;/h4&gt;
+
+&lt;p&gt;In your &lt;code&gt;~/.gradle/gradle.properties&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;org.gradle.daemon=true
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Dry Run output after enabling daemon&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;BUILD SUCCESSFUL
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;Total time: 1.757 secs
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h4&gt;Upgradle your gradle version&lt;/h4&gt;
+
+&lt;p&gt;The gradle team is constantly optimising the build performance and it is wise to be using the latest version for the best performance. Here is how you change it&lt;br&gt;
+In &lt;code&gt;&amp;lt;Project Root&amp;gt;/gradle/wrapper/&lt;/code&gt;&lt;br&gt;
+Edit &lt;code&gt;gradle-wrapper.properties&lt;/code&gt; and upgrade gradle &lt;code&gt;distributionUrl&lt;/code&gt; to the &lt;a href=&quot;http://gradle.org/gradle-download/&quot;&gt;latest&lt;/a&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The difference will be substantially good if you are upgrading from or below &lt;code&gt;2.4&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4&gt;Use JDK 8&lt;/h4&gt;
+
+&lt;p&gt;Groovy, being a dynamic language, can really benifit from the &lt;code&gt;invoke dynamic&lt;/code&gt; instruction in Java 7 and above. So using JDK7 or JDK8 will certainly be helpful.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Download and install &lt;a href=&quot;http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html&quot;&gt;JDK 8&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Cmd+Shift+A&lt;/code&gt; or &lt;code&gt;Ctrl+Shift+A&lt;/code&gt;, type &lt;code&gt;Project Structure&lt;/code&gt; and change &lt;code&gt;JDK Location&lt;/code&gt; to JDK 8 location&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4&gt;Parallel Execution&lt;/h4&gt;
+
+&lt;p&gt;If you have modules that are standalone, you can improve the build time a bit by enabling parallel execution.&lt;br&gt;
+In your &lt;code&gt;./gradle/gradle.properties&lt;/code&gt; or &lt;code&gt;&amp;lt;Project Root&amp;gt;/gradle.properties&lt;/code&gt;, add this line&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;org.gradle.parallel=true
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;Common Pitfalls&lt;/h2&gt;
+
+&lt;h4&gt;Dynamic dependencies&lt;/h4&gt;
+
+&lt;p&gt;Use definite version numbers for your dependencies in your gradle&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-groovy&quot; data-lang=&quot;groovy&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;c1&quot;&gt;//Do NOT do this&lt;/span&gt;
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;&lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;com.google.code.gson:gson:2.+&amp;#39;&lt;/span&gt;
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;&lt;span class=&quot;c1&quot;&gt;//Do this instead&lt;/span&gt;
+&lt;a name=&quot;line-5&quot;&gt;&lt;/a&gt;&lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;com.google.code.gson:gson:2.3&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This avoids the problem of gradle always making a network request to check for the latest version of the dependency&lt;/p&gt;
+
+&lt;h4&gt;Avoid heavy computation&lt;/h4&gt;
+
+&lt;p&gt;You can find snippets like this on stack overflow that aim to make versioning easier for you&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-groovy&quot; data-lang=&quot;groovy&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;git rev-list HEAD --first-parent --count&amp;#39;&lt;/span&gt;
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;gitVersion&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;trim&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toInteger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;&lt;span class=&quot;n&quot;&gt;android&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-5&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;n&quot;&gt;defaultConfig&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-6&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;versionCode&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;gitVersion&lt;/span&gt;
+&lt;a name=&quot;line-7&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;a name=&quot;line-8&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The problem with this code is - gradle needs to count the number of commits for every build. For a large repo which has around &lt;code&gt;20000&lt;/code&gt; commits, it takes around &lt;strong&gt;half a second&lt;/strong&gt; to just count the number of commits.&lt;/p&gt;
+
+&lt;h4&gt;That&amp;#39;s it&lt;/h4&gt;
+
+&lt;p&gt;After these optimisations your first build might take the same amount of time, but trust me your &lt;strong&gt;subsequent builds will be much faster&lt;/strong&gt; overall. &lt;/p&gt;
+
+&lt;p&gt;Also there is one more very important optimisation you can do&lt;/p&gt;
+
+&lt;h4&gt;Get an SSD&lt;/h4&gt;
+
+&lt;p&gt;Please do.&lt;/p&gt;</content><author><name>Manideep Polireddi</name></author><category term="android" /><category term="gradle" /><summary type="html">If you have the time to watch the video, go ahead. Madis Pink goes over each optimisation you can do very carefully and how you can profile the gradle build process to identify the bottlenecks of your builds. If not, go ahead do the changes mentioned below, which will take less than two minutes and enjoy a much smaller build times.</summary></entry><entry><title type="html">RxConfusions - Part 1 : Map and FlatMap</title><link href="https://okmanideep.github.io/RxConfusions-1-Map-and-FlatMap" rel="alternate" type="text/html" title="RxConfusions - Part 1 : Map and FlatMap" /><published>2015-12-02T01:40:00+05:30</published><updated>2015-12-02T01:40:00+05:30</updated><id>https://okmanideep.github.io/RxConfusions-1-Map-and-FlatMap</id><content type="html" xml:base="https://okmanideep.github.io/RxConfusions-1-Map-and-FlatMap">&lt;p&gt;If you don&amp;#39;t know what RxJava is or you aren&amp;#39;t comfortable with the terms &lt;code&gt;Observable&lt;/code&gt;, &lt;code&gt;Observer&lt;/code&gt;, &lt;code&gt;Operator&lt;/code&gt; and &lt;code&gt;Subscriber&lt;/code&gt;, I suggest you have a look at &lt;a href=&quot;http://blog.danlew.net/2014/09/15/grokking-rxjava-part-1/&quot;&gt;Grokking RxJava&lt;/a&gt; series by &lt;a href=&quot;https://twitter.com/danlew42&quot;&gt;Dan Lew&lt;/a&gt;. &lt;/p&gt;
+
+&lt;p&gt;If you have surfed through some RxJava content on the web, you should have come accross the &lt;code&gt;map()&lt;/code&gt; operator. It is exactly what you think it is. But you might have seen people using the &lt;code&gt;flatMap()&lt;/code&gt; operator in similar senarios which might have confused you a bit. Let&amp;#39;s use them both in a small example and observe the effects of these operators.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;#39;s use this simple &lt;code&gt;Observer&lt;/code&gt; for logging&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;onCompleted&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;onCompleted&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;line-5&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;onError&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Throwable&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-6&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;onError: %s\n&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;a name=&quot;line-7&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;a name=&quot;line-8&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;line-9&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;onNext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-10&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;onNext: %s\n&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;a name=&quot;line-11&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h4&gt;Simple use of map operator&lt;/h4&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;Printer&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;printer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Printer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;names&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;John&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Samuel&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Micheal&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Tom&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;};&lt;/span&gt;
+&lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;printer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;printTitlesUsingMap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;names&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;a name=&quot;line-5&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;a name=&quot;line-6&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;line-7&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;printTitlesUsingMap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;names&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-8&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;Observable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;from&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;names&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;a name=&quot;line-9&quot;&gt;&lt;/a&gt;            &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;Printer:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getTitle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;a name=&quot;line-10&quot;&gt;&lt;/a&gt;            &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;subscribe&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;a name=&quot;line-11&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;a name=&quot;line-12&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;line-13&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getTitle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-14&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;%s - %d&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
+&lt;a name=&quot;line-15&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Output :&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;onNext: John - 4
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;onNext: Micheal - 7
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;onNext: Tom - 3
+&lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;onNext: Samuel - 6
+&lt;a name=&quot;line-5&quot;&gt;&lt;/a&gt;onCompleted
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Lets make it a little interesting&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;  &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getTitle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IllegalArgumentException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;hll&quot;&gt;      &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;Micheal&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;equals&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&quot;hll&quot;&gt;          &lt;span class=&quot;k&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;IllegalArgumentException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;Too many Micheals&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&quot;hll&quot;&gt;      &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/span&gt;      &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;%s - %d&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Output :&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;onNext: John - 4
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;onNext: Samuel - 6
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;onError: java.lang.IllegalArgumentException: Too many Micheals
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Even though there are too many Micheals, you don&amp;#39;t want to stop printing once a Micheal arrives. You might be thinking lets use &lt;code&gt;filter()&lt;/code&gt; to filter out &lt;code&gt;Micheal&lt;/code&gt; but let us assume the printer doesn&amp;#39;t know when &lt;code&gt;getTitle()&lt;/code&gt; fails. Operators like &lt;code&gt;map()&lt;/code&gt; can&amp;#39;t change the flow items, they just modify the items which are emitted. This is when operators like &lt;code&gt;flatMap()&lt;/code&gt; come in handly&lt;/p&gt;
+
+&lt;h4&gt;Enter the FlatMap&lt;/h4&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;  &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;printTitlesUsingFlatMap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;names&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;Observable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;from&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;names&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+              &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;flatMap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;Printer:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getTitleObservable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+              &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;subscribe&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Observable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getTitleObservable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Observable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;create&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subscriber&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+          &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subscriber&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;isUnsubscribed&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;hll&quot;&gt;              &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&quot;hll&quot;&gt;                  &lt;span class=&quot;n&quot;&gt;subscriber&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;onNext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getTitle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;));&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&quot;hll&quot;&gt;              &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IllegalArgumentException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&quot;hll&quot;&gt;                  &lt;span class=&quot;c1&quot;&gt;//do nothing&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&quot;hll&quot;&gt;              &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&quot;hll&quot;&gt;              &lt;span class=&quot;n&quot;&gt;subscriber&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;onCompleted&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;/span&gt;          &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+      &lt;span class=&quot;o&quot;&gt;});&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Notice that we are calling &lt;code&gt;subscriber.onComplete()&lt;/code&gt; for every name. Guess the output... guessed it? Now have a look&lt;br&gt;
+Output :&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;onNext: John - 4
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;onNext: Samuel - 6
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;onNext: Tom - 3
+&lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;onCompleted
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Is that what you expected? Probably not. Now have a look at what happens if don&amp;#39;t call &lt;code&gt;subscriber.onComplete()&lt;/code&gt; when there is an exception.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Observable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;create&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subscriber&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subscriber&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;isUnsubscribed&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+          &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+              &lt;span class=&quot;n&quot;&gt;subscriber&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;onNext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getTitle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;));&lt;/span&gt;
+&lt;span class=&quot;hll&quot;&gt;              &lt;span class=&quot;n&quot;&gt;subscriber&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;onCompleted&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;/span&gt;          &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IllegalArgumentException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+              &lt;span class=&quot;c1&quot;&gt;//do nothing&lt;/span&gt;
+          &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+      &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Make a guess before you look at the output.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;onNext: John - 4
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;onNext: Samuel - 6
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;onNext: Tom - 3
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;No &lt;code&gt;onComplete()&lt;/code&gt; at all.&lt;br&gt;
+Now make a guess who is the &lt;code&gt;subscriber&lt;/code&gt; to our &lt;code&gt;getTitleObservable()&lt;/code&gt; function.  &lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The &lt;code&gt;flatMap()&lt;/code&gt; operator is our subscriber  &lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;If you are thiking - &amp;#39;Wait, &lt;code&gt;flatMap()&lt;/code&gt; is an &lt;em&gt;Operator&lt;/em&gt; not a &lt;em&gt;Subscriber&lt;/em&gt;&amp;#39;, you should watch &lt;a href=&quot;https://vimeo.com/144812843&quot;&gt;Demistifying RxJava Subscribers&lt;/a&gt; by &lt;a href=&quot;https://twitter.com/JakeWharton&quot;&gt;Jake Wharton&lt;/a&gt;. Basically, &lt;strong&gt;everything&lt;/strong&gt; is a subscriber.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;FlatMap&lt;/em&gt; collects all the observables returned for each item in the stream and emits all the items emitted by those observables. Simply put, it is a &lt;a href=&quot;https://github.com/ReactiveX/RxJava/blob/1.x/src/main/java/rx/Observable.java#L5204&quot;&gt;merge of all observables returned by your mapping function&lt;/a&gt;. 
+It calls &lt;code&gt;onComplete()&lt;/code&gt; only when all the observables are &lt;em&gt;completed&lt;/em&gt;.  &lt;/p&gt;
+
+&lt;p&gt;In this example &lt;code&gt;getTitleObservale(&amp;quot;Micheal&amp;quot;)&lt;/code&gt; wasn&amp;#39;t completed. So &lt;strong&gt;FlatMap is waiting&lt;/strong&gt; for it to complete(Yes, it is in the memory).&lt;/p&gt;
+
+&lt;p&gt;Visualise what happened in the above example. Now think about the &lt;code&gt;map()&lt;/code&gt; operator. If you feel like - &amp;#39;They are two very different operators&amp;#39;, then I have done my job. If you don&amp;#39;t, &lt;a href=&quot;https://twitter.com/okmanideep&quot;&gt;try confusing me as well&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;I am no expert in this topic. Just sharing as I learn. Please &lt;a href=&quot;https://twitter.com/okmanideep&quot;&gt;drop me a tweet&lt;/a&gt; or a comment if I got anything wrong. And share it to people who you think will find this useful.&lt;/p&gt;
+
+&lt;h3&gt;EDIT&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://artemzin.com/blog/rxjava-defer-execution-of-function-via-fromcallable/&quot;&gt;Artem Zinnatullin&lt;/a&gt;&amp;#39;s post suggests a better way to for our getTitleObservable().&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Observable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;fromCallable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getTitle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;));&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;By using this method, you don&amp;#39;t need to worry about calling the right functions to the subscriber. Thanks to &lt;a href=&quot;https://www.reddit.com/r/androiddev/comments/3u5w0c/if_you_are_writing_observablecreate_theres_a_big/&quot;&gt;pakoito&lt;/a&gt; for pointing that out.&lt;/p&gt;</content><author><name>Manideep Polireddi</name></author><category term="rxjava" /><category term="android" /><summary type="html">If you don&amp;#39;t know what RxJava is or you aren&amp;#39;t comfortable with the terms Observable, Observer, Operator and Subscriber, I suggest you have a look at Grokking RxJava series by Dan Lew.</summary></entry><entry><title type="html">Clean way to define support library dependencies</title><link href="https://okmanideep.github.io/clean-way-to-define-support-library-dependencies" rel="alternate" type="text/html" title="Clean way to define support library dependencies" /><published>2015-11-24T01:40:00+05:30</published><updated>2015-11-24T01:40:00+05:30</updated><id>https://okmanideep.github.io/clean-way-to-define-support-library-dependencies</id><content type="html" xml:base="https://okmanideep.github.io/clean-way-to-define-support-library-dependencies">&lt;p&gt;As the support library started getting bigger with more tools in it, the team at google have suggested developers to pick and choose the individual pieces of the library in their dependencies. More recently our &lt;code&gt;build.gradle&lt;/code&gt; files started to look like this&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-groovy&quot; data-lang=&quot;groovy&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;n&quot;&gt;dependencies&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;com.android.support:appcompat-v7:23.1.0&amp;#39;&lt;/span&gt;
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;com.android.support:design:23.1.0&amp;#39;&lt;/span&gt;
+&lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;com.android.support:pallete-v7:23.1.0&amp;#39;&lt;/span&gt;
+&lt;a name=&quot;line-5&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;com.android.support:cardview-v7:23.1.0&amp;#39;&lt;/span&gt;
+&lt;a name=&quot;line-6&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;com.android.support:recyclerview-v7:23.1.0&amp;#39;&lt;/span&gt;
+&lt;a name=&quot;line-7&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;So when a new release comes out, we have to change the version number in every single line. Chris Banes, from the Android developer relations team, in &lt;a href=&quot;https://www.youtube.com/watch?v=ihQ16K8gSuQ&amp;amp;t=17m58s&quot;&gt;Android Dev Summit 2015&lt;/a&gt; has given this great tip to solve this problem.&lt;/p&gt;
+
+&lt;blockquote class=&quot;twitter-tweet&quot; lang=&quot;en&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;This! &lt;a href=&quot;https://twitter.com/hashtag/AndroidDev?src=hash&quot;&gt;#AndroidDev&lt;/a&gt; &lt;a href=&quot;https://twitter.com/hashtag/AndroidDevSummit?src=hash&quot;&gt;#AndroidDevSummit&lt;/a&gt;&amp;#10;🙏 &lt;a href=&quot;https://twitter.com/chrisbanes&quot;&gt;@chrisbanes&lt;/a&gt; &lt;a href=&quot;https://t.co/v47Pm74ohj&quot;&gt;pic.twitter.com/v47Pm74ohj&lt;/a&gt;&lt;/p&gt;&amp;mdash; Manideep Polireddi (@okmanideep) &lt;a href=&quot;https://twitter.com/okmanideep/status/669195097947377664&quot;&gt;November 24, 2015&lt;/a&gt;&lt;/blockquote&gt;
+
+&lt;script async src=&quot;//platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Great! But there is a small &lt;strong&gt;catch&lt;/strong&gt; here  &lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;compile &amp;#39;com.android.support:appcompat-v7:${supportLibVersion}&amp;#39;&lt;/code&gt; &lt;strong&gt;doesn&amp;#39;t work&lt;/strong&gt;&lt;br&gt;
+&lt;code&gt;compile &amp;quot;com.android.support:appcompat-v7:${supportLibVersion}&amp;quot;&lt;/code&gt; &lt;strong&gt;WORKS!!!&lt;/strong&gt;  &lt;/p&gt;
+
+&lt;p&gt;If you haven&amp;#39;t noticed yet, you should use &lt;strong&gt;double quotes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;So the final code looks like this&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-groovy&quot; data-lang=&quot;groovy&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;n&quot;&gt;ext&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;supportLibVersion&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;23.1.1&amp;#39;&lt;/span&gt;
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;line-5&quot;&gt;&lt;/a&gt;&lt;span class=&quot;n&quot;&gt;dependencies&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-6&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;com.android.support:appcompat-v7:${supportLibVersion}&amp;quot;&lt;/span&gt;
+&lt;a name=&quot;line-7&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;com.android.support:design:${supportLibVersion}&amp;quot;&lt;/span&gt;
+&lt;a name=&quot;line-8&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;com.android.support:pallete-v7:${supportLibVersion}&amp;quot;&lt;/span&gt;
+&lt;a name=&quot;line-9&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;com.android.support:cardview-v7:${supportLibVersion}&amp;quot;&lt;/span&gt;
+&lt;a name=&quot;line-10&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;com.android.support:recyclerview-v7:${supportLibVersion}&amp;quot;&lt;/span&gt;
+&lt;a name=&quot;line-11&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;By the way, Android Studio is intelligent enough that it will suggest you to update the version when there is a new one out, even in the above format. All hail IntelliJ.&lt;/p&gt;</content><author><name>Manideep Polireddi</name></author><category term="android" /><summary type="html">As the support library started getting bigger with more tools in it, the team at google have suggested developers to pick and choose the individual pieces of the library in their dependencies. More recently our build.gradle files started to look like this</summary></entry><entry><title type="html">Better code blocks in Jekyll</title><link href="https://okmanideep.github.io/better-code-blocks-in-jekyll" rel="alternate" type="text/html" title="Better code blocks in Jekyll" /><published>2015-11-24T01:40:00+05:30</published><updated>2015-11-24T01:40:00+05:30</updated><id>https://okmanideep.github.io/better-code-blocks-in-jekyll</id><content type="html" xml:base="https://okmanideep.github.io/better-code-blocks-in-jekyll">&lt;p&gt;If you are blogging a lot of code, it makes a huge difference if you style your code blocks well. If you are using some Jekyll theme, chances are the default output is not so pleasing. If you are not much familiar with &lt;code&gt;Jekyll&lt;/code&gt; or &lt;code&gt;Pygments&lt;/code&gt;, trust me it would take a lot of time to get what you want by just searching the web. I have gathered  all the scattered suggestions I found and arranged them into this post. Let&amp;#39;s make your code look better&lt;/p&gt;
+
+&lt;h2&gt;Setting up pygments&lt;/h2&gt;
+
+&lt;p&gt;In &lt;code&gt;_config.yml&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;ss&quot;&gt;markdown&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;redcarpet&lt;/span&gt;
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;&lt;span class=&quot;ss&quot;&gt;redcarpet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;ss&quot;&gt;extension&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+&lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;        &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fenced_code_blocks&lt;/span&gt;
+&lt;a name=&quot;line-5&quot;&gt;&lt;/a&gt;&lt;span class=&quot;ss&quot;&gt;highlighter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pygments&lt;/span&gt;
+&lt;a name=&quot;line-6&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
+&lt;a name=&quot;line-7&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This sets &lt;code&gt;redcarpet&lt;/code&gt; as our markdown parser and &lt;code&gt;pygments&lt;/code&gt; as our code highlighter.&lt;br&gt;
+And &lt;code&gt;fenced_code_blocks&lt;/code&gt; extension enables you to write code blocks like in Github flavoured markdown using ```  &lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;a name=&quot;True-1&quot;&gt;&lt;/a&gt;```css
+&lt;a name=&quot;True-2&quot;&gt;&lt;/a&gt;.left {float: left;}
+&lt;a name=&quot;True-3&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;True-4&quot;&gt;&lt;/a&gt;.right {float: right;}
+&lt;a name=&quot;True-5&quot;&gt;&lt;/a&gt;```&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2&gt;Syntax highlighting&lt;/h2&gt;
+
+&lt;p&gt;By now your code probably looks like this&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;  .left {float: left;}
+  
+  .right {float: right;}&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Just like plain text and no syntax highlighting based on the language you specified. But if you look at source you can see that &lt;code&gt;pygments&lt;/code&gt; has analysed the code as css and added some classes to different parts of the code. All we need to do is add some css to those classes.&lt;/p&gt;
+
+&lt;p&gt;I have written a &lt;a href=&quot;https://gist.github.com/okmanideep/aa0890c6da9104e16a7a&quot;&gt;github like color scheme&lt;/a&gt;. You can find other styles online for &lt;a href=&quot;https://www.google.co.in/search?q=pygments+syntax+highlighting+css&quot;&gt;pygments syntax highlighting css&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;After adding the sytax highlighting css your code should look like this&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;  &lt;span class=&quot;nc&quot;&gt;.left&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;left&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;}&lt;/span&gt;
+  
+  &lt;span class=&quot;nc&quot;&gt;.right&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;right&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2&gt;Line Numbers&lt;/h2&gt;
+
+&lt;p&gt;As mentioned by &lt;a href=&quot;https://drewsilcock.co.uk/proper-linenumbers/&quot;&gt;Drew Silcock&lt;/a&gt;, &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters&quot;&gt;CSS Counters&lt;/a&gt; is the best way to add line numbers to your code blocks. Add css counters to your &lt;code&gt;pre&lt;/code&gt; blocks using &lt;a href=&quot;https://gist.github.com/okmanideep/55419a959b7fd39a1c89&quot;&gt;jekyll-pygments-line-numbers.css&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;To use this technique we should tell pygments to generate &lt;code&gt;lineanchors&lt;/code&gt; for the code blocks. We can do this by using liquid template tags for our code blocks&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&lt;a name=&quot;True-1&quot;&gt;&lt;/a&gt;{% highlight css %}
+&lt;a name=&quot;True-2&quot;&gt;&lt;/a&gt;.left {float: left;}
+&lt;a name=&quot;True-3&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;True-4&quot;&gt;&lt;/a&gt;.right {float: right;}
+&lt;a name=&quot;True-5&quot;&gt;&lt;/a&gt;{% endhighlight %}&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;But we want to write our code block using ```&lt;code&gt;css&lt;/code&gt;. We can do this by adding a custom redcarpet parser. Add this &lt;code&gt;redcarpet-custom.rb&lt;/code&gt; file to your &lt;code&gt;_plugins&lt;/code&gt; folder&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;k&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Jekyll&lt;/span&gt;
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;k&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Converters&lt;/span&gt;
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Markdown&lt;/span&gt;
+&lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;      &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;RedcarpetParser&lt;/span&gt;
+&lt;a name=&quot;line-5&quot;&gt;&lt;/a&gt;        &lt;span class=&quot;k&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;WithPygments&lt;/span&gt;
+&lt;a name=&quot;line-6&quot;&gt;&lt;/a&gt;          &lt;span class=&quot;kp&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;CommonMethods&lt;/span&gt;
+&lt;a name=&quot;line-7&quot;&gt;&lt;/a&gt;          &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;block_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lang&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;a name=&quot;line-8&quot;&gt;&lt;/a&gt;            &lt;span class=&quot;nb&quot;&gt;require&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;pygments&amp;#39;&lt;/span&gt;
+&lt;a name=&quot;line-9&quot;&gt;&lt;/a&gt;            &lt;span class=&quot;n&quot;&gt;lang&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lang&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lang&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;first&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;text&amp;quot;&lt;/span&gt;
+&lt;a name=&quot;line-10&quot;&gt;&lt;/a&gt;            &lt;span class=&quot;n&quot;&gt;output&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;add_code_tags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+&lt;a name=&quot;line-11&quot;&gt;&lt;/a&gt;              &lt;span class=&quot;no&quot;&gt;Pygments&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;highlight&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:lexer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lang&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;a name=&quot;line-12&quot;&gt;&lt;/a&gt;                                 &lt;span class=&quot;ss&quot;&gt;:options&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:encoding&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:lineanchors&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;line&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}),&lt;/span&gt;
+&lt;a name=&quot;line-13&quot;&gt;&lt;/a&gt;              &lt;span class=&quot;n&quot;&gt;lang&lt;/span&gt;
+&lt;a name=&quot;line-14&quot;&gt;&lt;/a&gt;            &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;a name=&quot;line-15&quot;&gt;&lt;/a&gt;          &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;a name=&quot;line-16&quot;&gt;&lt;/a&gt;        &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;a name=&quot;line-17&quot;&gt;&lt;/a&gt;      &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;a name=&quot;line-18&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;a name=&quot;line-19&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;a name=&quot;line-20&quot;&gt;&lt;/a&gt;&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;You can add as many &lt;a href=&quot;http://pygments.org/docs/formatters/&quot;&gt;Pygment options&lt;/a&gt; to the &lt;code&gt;:options =&amp;gt; { ... }&lt;/code&gt; hash. The above ovverrides the &lt;a href=&quot;https://github.com/jekyll/jekyll/blob/master/lib/jekyll/converters/markdown/redcarpet_parser.rb&quot;&gt;WithPygments module&lt;/a&gt; of the redcarpet parser.&lt;/p&gt;
+
+&lt;p&gt;After this your code blocks should look like&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;nc&quot;&gt;.left&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;left&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;}&lt;/span&gt;
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;&lt;span class=&quot;nc&quot;&gt;.right&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;right&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;Line highlighting&lt;/h2&gt;
+
+&lt;p&gt;...&lt;/p&gt;</content><author><name>Manideep Polireddi</name></author><category term="jekyll" /><category term="gh-pages" /><summary type="html">If you are blogging a lot of code, it makes a huge difference if you style your code blocks well. If you are using some Jekyll theme, chances are the default output is not so pleasing. If you are not much familiar with Jekyll or Pygments, trust me it would take a lot of time to get what you want by just searching the web. I have gathered all the scattered suggestions I found and arranged them into this post. Let&amp;#39;s make your code look better</summary></entry><entry><title type="html">Permissions in marshmallow</title><link href="https://okmanideep.github.io/permissions-in-marshmallow" rel="alternate" type="text/html" title="Permissions in marshmallow" /><published>2015-11-15T01:40:00+05:30</published><updated>2015-11-15T01:40:00+05:30</updated><id>https://okmanideep.github.io/permissions-in-marshmallow</id><content type="html" xml:base="https://okmanideep.github.io/permissions-in-marshmallow">&lt;p&gt;I expect you to first go and have a look at this page in the &lt;a href=&quot;http://developer.android.com/training/permissions/requesting.html&quot;&gt;Android Bible&lt;/a&gt; about permissions in marshmallow. Especially have a look at how to:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Request the permissions you need&lt;/li&gt;
+&lt;li&gt;Handle the permissions request response&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4&gt;Requesting for permission&lt;/h4&gt;
+
+&lt;p&gt;You might have seen a code snippet like below in the training page.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;c1&quot;&gt;// Here, thisActivity is the current activity&lt;/span&gt;
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ContextCompat&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;checkSelfPermission&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;thisActivity&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;                &lt;span class=&quot;n&quot;&gt;Manifest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;permission&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;READ_CONTACTS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;        &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PackageManager&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;PERMISSION_GRANTED&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-5&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;c1&quot;&gt;// Should we show an explanation?&lt;/span&gt;
+&lt;a name=&quot;line-6&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ActivityCompat&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;shouldShowRequestPermissionRationale&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;thisActivity&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
+&lt;a name=&quot;line-7&quot;&gt;&lt;/a&gt;            &lt;span class=&quot;n&quot;&gt;Manifest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;permission&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;READ_CONTACTS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-8&quot;&gt;&lt;/a&gt;        &lt;span class=&quot;c1&quot;&gt;//show user the reason for permission&lt;/span&gt;
+&lt;a name=&quot;line-9&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-10&quot;&gt;&lt;/a&gt;        &lt;span class=&quot;c1&quot;&gt;//request permission&lt;/span&gt;
+&lt;a name=&quot;line-11&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;a name=&quot;line-12&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3&gt;Pay Attention&lt;/h3&gt;
+
+&lt;p&gt;Lets just dive into the only tricky part here - &lt;code&gt;shouldShowRequestPermissionRationale()&lt;/code&gt; returns&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;true&lt;/strong&gt; if 
+
+&lt;ul&gt;
+&lt;li&gt;The app has requested this permission previously and the user denied the request &lt;strong&gt;in the dialog&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;User has toggled off the permission &lt;strong&gt;in the settings&lt;/strong&gt; (&lt;em&gt;Even if the app hasn&amp;#39;t requested the permission yet, if the user just has toggled the switch on and off in the settings page, you are expected to show the rationale&lt;/em&gt;)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;false&lt;/strong&gt; if
+
+&lt;ul&gt;
+&lt;li&gt;The app didn&amp;#39;t request for this permission yet&lt;/li&gt;
+&lt;li&gt;The user denied the permission and chose &lt;strong&gt;Don&amp;#39;t ask again&lt;/strong&gt; option&lt;/li&gt;
+&lt;li&gt;The device policy prohibits the app from having that permission (&lt;em&gt;Mostly in enterprise cenarios&lt;/em&gt;)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Consider this possible case&lt;/h3&gt;
+
+&lt;p&gt;The above code works pretty much in most practical cases. Let us consider this case:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The user has chosen &lt;strong&gt;Don&amp;#39;t ask again&lt;/strong&gt; for contacts access in the past (&lt;em&gt;which will most probably never happen if you have requested permissions gracefully and if the user made the decision conciously&lt;/em&gt;) &lt;/li&gt;
+&lt;li&gt;And now the user wants to send a contact to his friend &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;There is no way to detect using the above code that we were denied the permission, and ask him to grant the permission via application settings.&lt;/p&gt;
+
+&lt;h3&gt;The way out&lt;/h3&gt;
+
+&lt;p&gt;Check for &lt;code&gt;shouldShowRequestPermissionRationale()&lt;/code&gt; before and after asking permission. If it returns false both the times then the user chose &amp;#39;Don&amp;#39;t ask again&amp;#39; in the past or the device policy doesn&amp;#39;t allow for that permission.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;  &lt;span class=&quot;kt&quot;&gt;boolean&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;before&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;after&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+  &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;requestContactsPermission&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ContextCompat&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;checkSelfPermission&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;thisActivity&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
+                      &lt;span class=&quot;n&quot;&gt;Manifest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;permission&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;READ_CONTACTS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+              &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PackageManager&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;PERMISSION_GRANTED&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+          &lt;span class=&quot;c1&quot;&gt;// Should we show an explanation?&lt;/span&gt;
+&lt;span class=&quot;hll&quot;&gt;          &lt;span class=&quot;n&quot;&gt;before&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ActivityCompat&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;shouldShowRequestPermissionRationale&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;thisActivity&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&quot;hll&quot;&gt;                  &lt;span class=&quot;n&quot;&gt;Manifest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;permission&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;READ_CONTACTS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&quot;hll&quot;&gt;          &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;before&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;/span&gt;              &lt;span class=&quot;c1&quot;&gt;//show user the reason for permission&lt;/span&gt;
+          &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+              &lt;span class=&quot;c1&quot;&gt;//request permission&lt;/span&gt;
+          &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+      &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
+  &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;onRequestPermissionsResult&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;requestCode&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
+          &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;permissions&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[],&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;grantResults&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;switch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;requestCode&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+          &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;MY_PERMISSIONS_REQUEST_READ_CONTACTS:&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+              &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;grantResults&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+                  &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;grantResults&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PackageManager&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;PERMISSION_GRANTED&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                  &lt;span class=&quot;c1&quot;&gt;// permission was granted, yay! Do the&lt;/span&gt;
+                  &lt;span class=&quot;c1&quot;&gt;// contacts-related task you need to do.&lt;/span&gt;
+              &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;hll&quot;&gt;                  &lt;span class=&quot;n&quot;&gt;after&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ActivityCompat&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;shouldShowRequestPermissionRationale&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&quot;hll&quot;&gt;                  &lt;span class=&quot;n&quot;&gt;thisActivity&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&quot;hll&quot;&gt;                  &lt;span class=&quot;n&quot;&gt;Manifest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;permission&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;READ_CONTACTS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&quot;hll&quot;&gt;                  &lt;span class=&quot;kt&quot;&gt;boolean&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;goToSettings&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;after&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;before&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&quot;hll&quot;&gt;                  &lt;span class=&quot;n&quot;&gt;showRationale&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;goToSettings&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;/span&gt;              &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+              &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+          &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+      &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;If both &lt;code&gt;before&lt;/code&gt; and &lt;code&gt;after&lt;/code&gt; are &lt;code&gt;false&lt;/code&gt;, then show the user a dialog explaining that we need the contacts permission with a &amp;#39;GO TO SETTINGS&amp;#39; button. On click take him to your application in the settings like this :&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;goToSettings&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;a name=&quot;line-2&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;Intent&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;intent&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Intent&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;a name=&quot;line-3&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;intent&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setAction&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Settings&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;ACTION_APPLICATION_DETAILS_SETTINGS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;Uri&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;uri&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Uri&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;parse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;package:&amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getPackageName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
+&lt;a name=&quot;line-5&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;intent&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setData&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;uri&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;a name=&quot;line-6&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;n&quot;&gt;startActivity&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;intent&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;a name=&quot;line-7&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><author><name>Manideep Polireddi</name></author><category term="android" /><summary type="html">I expect you to first go and have a look at this page in the Android Bible about permissions in marshmallow. Especially have a look at how to:</summary></entry></feed>
