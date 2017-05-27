@@ -7,7 +7,7 @@ date:   2015-12-01 20:10:00
 tags: rxjava android
 class: 'post-template'
 subclass: 'post tag-rxjava tag-android'
-categories: 'manidesto'
+categories: 'okmanideep'
 navigation: True
 disqus: 20151201201000
 logo: '/assets/images/logo_black.png'
@@ -151,9 +151,9 @@ It calls `onComplete()` only when all the observables are *completed*.
 
 In this example `getTitleObservale("Micheal")` wasn't completed. So **FlatMap is waiting** for it to complete(Yes, it is in the memory).
 
-Visualise what happened in the above example. Now think about the `map()` operator. If you feel like - 'They are two very different operators', then I have done my job. If you don't, [try confusing me as well](https://twitter.com/manidesto).
+Visualise what happened in the above example. Now think about the `map()` operator. If you feel like - 'They are two very different operators', then I have done my job. If you don't, [try confusing me as well](https://twitter.com/okmanideep).
 
-I am no expert in this topic. Just sharing as I learn. Please [drop me a tweet](https://twitter.com/manidesto) or a comment if I got anything wrong. And share it to people who you think will find this useful.
+I am no expert in this topic. Just sharing as I learn. Please [drop me a tweet](https://twitter.com/okmanideep) or a comment if I got anything wrong. And share it to people who you think will find this useful.
 
 ### EDIT ###
 

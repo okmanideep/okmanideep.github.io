@@ -17,7 +17,7 @@ timezone: 'Asia/Kolkata'
 baseurl: ''
 
 # Website info
-name: 'Blog | Manidesto'
+name: 'Blog | Manideep'
 description: "Android · Development · Design"
 logo: '/assets/images/logo_black_square.png'
 fblogo: '/assets/images/logo_fb.jpg'
@@ -25,14 +25,14 @@ fblogo: '/assets/images/logo_fb.jpg'
 # Author's info
 author: 'Manideep Polireddi'
 # edit 'categories' in the front matter of every post to match this username
-username: manidesto
+username: okmanideep
 bio: 'Android developer · Design Enthusiast'
 location: 'Mumbai, India'
-url: 'http://manidesto.github.io'
-image: '/assets/images/manidesto.jpg'
-twitter: 'manidesto'
+url: 'http://okmanideep.github.io'
+image: '/assets/images/okmanideep.jpg'
+twitter: 'okmanideep'
 
-short_url: 'manidesto.github.io/'
+short_url: 'okmanideep.github.io/'
 google_analytics: UA-57441445-3
 disqus: manidesto
 
@@ -43,7 +43,10 @@ permalink: :title
 
 
 # gems and other configs
-gems: [jekyll-paginate]
+gems:
+    - jekyll-paginate
+    - jekyll-feed
+
 exclude: [vendor]
 
 # Additional settings available on the front-matter

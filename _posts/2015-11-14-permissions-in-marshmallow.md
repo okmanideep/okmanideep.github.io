@@ -7,7 +7,7 @@ date:   2015-11-14 20:10:00
 tags: android
 class: 'post-template'
 subclass: 'post tag-android'
-categories: 'manidesto'
+categories: 'okmanideep'
 navigation: True
 disqus: 20151114201000
 logo: '/assets/images/logo_black.png'

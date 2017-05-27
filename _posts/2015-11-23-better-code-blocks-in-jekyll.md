@@ -7,7 +7,7 @@ date:   2015-11-23 20:10:00
 tags: jekyll gh-pages
 class: 'post-template'
 subclass: 'post tag-jekyll tag-gh-pages'
-categories: 'manidesto'
+categories: 'okmanideep'
 navigation: True
 disqus: 20151123201000
 logo: '/assets/images/logo_black.png'
@@ -51,7 +51,7 @@ By now your code probably looks like this
 
 Just like plain text and no syntax highlighting based on the language you specified. But if you look at source you can see that `pygments` has analysed the code as css and added some classes to different parts of the code. All we need to do is add some css to those classes.
 
-I have written a [github like color scheme](https://gist.github.com/manidesto/aa0890c6da9104e16a7a). You can find other styles online for [pygments syntax highlighting css](https://www.google.co.in/search?q=pygments+syntax+highlighting+css).
+I have written a [github like color scheme](https://gist.github.com/okmanideep/aa0890c6da9104e16a7a). You can find other styles online for [pygments syntax highlighting css](https://www.google.co.in/search?q=pygments+syntax+highlighting+css).
 
 After adding the sytax highlighting css your code should look like this
 
@@ -62,7 +62,7 @@ After adding the sytax highlighting css your code should look like this
 {% endhighlight %}
 
 ## Line Numbers ##
-As mentioned by [Drew Silcock](https://drewsilcock.co.uk/proper-linenumbers/), [CSS Counters](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters) is the best way to add line numbers to your code blocks. Add css counters to your `pre` blocks using [jekyll-pygments-line-numbers.css](https://gist.github.com/manidesto/55419a959b7fd39a1c89).
+As mentioned by [Drew Silcock](https://drewsilcock.co.uk/proper-linenumbers/), [CSS Counters](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters) is the best way to add line numbers to your code blocks. Add css counters to your `pre` blocks using [jekyll-pygments-line-numbers.css](https://gist.github.com/okmanideep/55419a959b7fd39a1c89).
 
 To use this technique we should tell pygments to generate `lineanchors` for the code blocks. We can do this by using liquid template tags for our code blocks
 

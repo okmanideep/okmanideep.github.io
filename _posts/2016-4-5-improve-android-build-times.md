@@ -7,7 +7,7 @@ date:   2016-04-05 20:10:00
 tags: android gradle
 class: 'post-template'
 subclass: 'post tag-android tag-gradle'
-categories: 'manidesto'
+categories: 'okmanideep'
 navigation: True
 disqus: 20160405201000
 logo: '/assets/images/logo_black.png'
