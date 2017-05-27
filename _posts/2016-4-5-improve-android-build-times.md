@@ -10,7 +10,7 @@ subclass: 'post tag-android tag-gradle'
 categories: 'okmanideep'
 navigation: True
 disqus: 20160405201000
-logo: '/assets/images/logo_black.png'
+logo: 'logo_black.png'
 ---
 
 If you have the time to watch the video, go ahead. [Madis Pink](https://twitter.com/madisp) goes over each optimisation you can do very carefully and how you can profile the gradle build process to identify the bottlenecks of your builds. If not, go ahead do the changes mentioned below, which will take less than two minutes and enjoy a much smaller build times.

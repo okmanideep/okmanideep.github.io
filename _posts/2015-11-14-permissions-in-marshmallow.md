@@ -10,7 +10,7 @@ subclass: 'post tag-android'
 categories: 'okmanideep'
 navigation: True
 disqus: 20151114201000
-logo: '/assets/images/logo_black.png'
+logo: 'logo_black.png'
 ---
 
 I expect you to first go and have a look at this page in the [Android Bible](http://developer.android.com/training/permissions/requesting.html) about permissions in marshmallow. Especially have a look at how to:

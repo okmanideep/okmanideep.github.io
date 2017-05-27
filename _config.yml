@@ -19,8 +19,8 @@ baseurl: ''
 # Website info
 name: 'Blog | Manideep'
 description: "Android · Development · Design"
-logo: '/assets/images/logo_black_square.png'
-fblogo: '/assets/images/logo_fb.jpg'
+logo: 'logo_black_square.png'
+fblogo: 'logo_fb.jpg'
 
 # Author's info
 author: 'Manideep Polireddi'
@@ -28,8 +28,8 @@ author: 'Manideep Polireddi'
 username: okmanideep
 bio: 'Android developer · Design Enthusiast'
 location: 'Mumbai, India'
-url: 'http://okmanideep.github.io'
-image: '/assets/images/okmanideep.jpg'
+url: 'https://okmanideep.github.io'
+image: 'okmanideep.jpg'
 twitter: 'okmanideep'
 
 short_url: 'okmanideep.github.io/'
@@ -41,11 +41,29 @@ permalink: :title
 # permalink: /author/:username
 # permalink: /tag/:tag
 
+assets:
+    compress:
+        css: true
+        js: true
+    autowrite: true
+    cdn: ''
+    prefix: "/assets"
+    digest: true
+    assets:
+        - "main.css"
+        - "*.jpg"
+        - "*.png"
+        - "index.js"
+    sources:
+        - _assets/js
+    features:
+        automatic_img_size: false
 
 # gems and other configs
 gems:
     - jekyll-paginate
     - jekyll-feed
+    - jekyll-assets
 
 exclude: [vendor]
 

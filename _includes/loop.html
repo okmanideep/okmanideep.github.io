@@ -23,7 +23,7 @@
             <p>{{ post.content | truncatewords: 26 }} <a class="read-more" href="{{ site.baseurl }}{{ post.url }}">&raquo;</a></p>
         </section>
         <footer class="post-meta">
-            {% if site.image %}<img class="author-thumb" src="{{ site.baseurl }}{{ site.image }}" alt="Author image" nopin="nopin" />{% endif %}
+            {% if site.image %}{% img "{{ site.image }}" alt:'Site Image' nopin:'nopin' class:'author-thumb' %}{% endif %}
             <!-- author -->
             <a href='{{ site.baseurl }}/author/{{ site.username }}'>{{ site.author }}</a>
             <!-- [[tags prefix=" on "]] -->

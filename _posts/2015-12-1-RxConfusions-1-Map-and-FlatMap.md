@@ -10,7 +10,7 @@ subclass: 'post tag-rxjava tag-android'
 categories: 'okmanideep'
 navigation: True
 disqus: 20151201201000
-logo: '/assets/images/logo_black.png'
+logo: 'logo_black.png'
 ---
 
 If you don't know what RxJava is or you aren't comfortable with the terms `Observable`, `Observer`, `Operator` and `Subscriber`, I suggest you have a look at [Grokking RxJava](http://blog.danlew.net/2014/09/15/grokking-rxjava-part-1/) series by [Dan Lew](https://twitter.com/danlew42). 

@@ -7,14 +7,14 @@
     <meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.name }}{% endif %}" />
     <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}" />
     <meta property="og:url" content="{{ site.url }}{{ site.baseurl }}{{ page.url }}" />
-    <meta property="og:image" content="{{ site.url }}{{ site.baseurl }}{% if page.cover %}{{ page.cover }}{% else %}{{ site.fblogo }}{% endif %}" />
+    <meta property="og:image" content="{{ site.url }}{{ site.baseurl }}{% if page.cover %}{{ page.cover }}{% else %}{{ site.fblogo | asset_path }}{% endif %}" />
     <meta property="og:locale" content="en_US" />
     <meta property="article:author" content="https://www.facebook.com/manideepiitb">
 
     <meta name="twitter:card" content="{% if page.cover %}summary_large_image{% else %}summary{% endif %}" />
     <meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.name }}{% endif %}" />
     <meta name="twitter:description" content="{% if page.description %}{{ page.description}}{% else %}{{ site.description }}{% endif %}" />
-    <meta name="twitter:image" content="{{ site.url }}{{ site.baseurl }}{% if page.cover %}{{ page.cover }}{% else %}{{ site.logo }}{% endif %}" />
+    <meta name="twitter:image" content="{{ site.url }}{{ site.baseurl }}{% if page.cover %}{{ page.cover }}{% else %}{{ site.logo | asset_path }}{% endif %}" />
     <meta name="twitter:author" content="@{{ site.username }}">
 
     <script type="application/ld+json">
@@ -22,8 +22,8 @@
     "@context": "http://schema.org",
     "@type": "Website",
     "publisher": "Manideep Polireddi",
-    "url": "{{ site.baseurl }}",
-    "image": "{{ site.baseurl }}/assets/images/logo_black.jpg",
+    "url": "https://okmanideep.github.io",
+    "image": "{{ "logo_black.png" | asset_path }}",
     "description": "{{ site.description }}"
 }
     </script>
