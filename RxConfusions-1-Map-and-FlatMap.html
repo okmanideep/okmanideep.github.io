@@ -102,7 +102,7 @@
             <h1 class="post-title">RxConfusions - Part 1 : Map and FlatMap</h1>
             <section class="post-meta">
             <!-- <a href=''>Manideep Polireddi</a> -->
-            <time class="post-date" datetime="2015-12-02">02 Dec 2015</time>
+            <time class="post-date" datetime="2015-12-01">01 Dec 2015</time>
                 <!-- [[tags prefix=" on "]] -->
                  
                 on 
@@ -128,7 +128,7 @@
 <p>If you have surfed through some RxJava content on the web, you should have come accross the <code>map()</code> operator. It is exactly what you think it is. But you might have seen people using the <code>flatMap()</code> operator in similar senarios which might have confused you a bit. Let&#39;s use them both in a small example and observe the effects of these operators.</p>
 
 <p>Let&#39;s use this simple <code>Observer</code> for logging</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><a name="line-1"></a><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCompleted</span><span class="o">()</span> <span class="o">{</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><a name="line-1"></a><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCompleted</span><span class="o">()</span> <span class="o">{</span>
 <a name="line-2"></a>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;onCompleted&quot;</span><span class="o">);</span>
 <a name="line-3"></a><span class="o">}</span>
 <a name="line-4"></a>
@@ -141,15 +141,15 @@
 <a name="line-11"></a><span class="o">}</span>
 </code></pre></div>
 <h4>Simple use of map operator</h4>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><a name="line-1"></a><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-<a name="line-2"></a>    <span class="n">Printer</span> <span class="n">printer</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Printer</span><span class="o">();</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><a name="line-1"></a><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+<a name="line-2"></a>    <span class="n">Printer</span> <span class="n">printer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Printer</span><span class="o">();</span>
 <a name="line-3"></a>    <span class="n">String</span><span class="o">[]</span> <span class="n">names</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]</span> <span class="o">{</span><span class="s">&quot;John&quot;</span><span class="o">,</span> <span class="s">&quot;Samuel&quot;</span><span class="o">,</span> <span class="s">&quot;Micheal&quot;</span><span class="o">,</span> <span class="s">&quot;Tom&quot;</span><span class="o">};</span>
 <a name="line-4"></a>    <span class="n">printer</span><span class="o">.</span><span class="na">printTitlesUsingMap</span><span class="o">(</span><span class="n">names</span><span class="o">);</span>
 <a name="line-5"></a><span class="o">}</span>
 <a name="line-6"></a>
 <a name="line-7"></a><span class="kd">private</span> <span class="kt">void</span> <span class="nf">printTitlesUsingMap</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">names</span><span class="o">)</span> <span class="o">{</span>
 <a name="line-8"></a>    <span class="n">Observable</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">names</span><span class="o">)</span>
-<a name="line-9"></a>            <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="nl">Printer:</span><span class="o">:</span><span class="n">getTitle</span><span class="o">)</span>
+<a name="line-9"></a>            <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="n">Printer</span><span class="o">::</span><span class="n">getTitle</span><span class="o">)</span>
 <a name="line-10"></a>            <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
 <a name="line-11"></a><span class="o">}</span>
 <a name="line-12"></a>
@@ -158,31 +158,31 @@
 <a name="line-15"></a><span class="o">}</span>
 </code></pre></div>
 <p>Output :</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>onNext: John - 4
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a name="line-1"></a>onNext: John - 4
 <a name="line-2"></a>onNext: Micheal - 7
 <a name="line-3"></a>onNext: Tom - 3
 <a name="line-4"></a>onNext: Samuel - 6
 <a name="line-5"></a>onCompleted
 </code></pre></div>
 <p>Lets make it a little interesting</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java">  <span class="kd">private</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getTitle</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IllegalArgumentException</span><span class="o">{</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span>  <span class="kd">private</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getTitle</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IllegalArgumentException</span><span class="o">{</span>
 <span class="hll">      <span class="k">if</span><span class="o">(</span><span class="s">&quot;Micheal&quot;</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">name</span><span class="o">))</span> <span class="o">{</span>
-</span><span class="hll">          <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">&quot;Too many Micheals&quot;</span><span class="o">);</span>
+</span><span class="hll">          <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span><span class="s">&quot;Too many Micheals&quot;</span><span class="o">);</span>
 </span><span class="hll">      <span class="o">}</span>
 </span>      <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;%s - %d&quot;</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="n">name</span><span class="o">.</span><span class="na">length</span><span class="o">());</span>
   <span class="o">}</span>
 </code></pre></div>
 <p>Output :</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>onNext: John - 4
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a name="line-1"></a>onNext: John - 4
 <a name="line-2"></a>onNext: Samuel - 6
 <a name="line-3"></a>onError: java.lang.IllegalArgumentException: Too many Micheals
 </code></pre></div>
 <p>Even though there are too many Micheals, you don&#39;t want to stop printing once a Micheal arrives. You might be thinking lets use <code>filter()</code> to filter out <code>Micheal</code> but let us assume the printer doesn&#39;t know when <code>getTitle()</code> fails. Operators like <code>map()</code> can&#39;t change the flow items, they just modify the items which are emitted. This is when operators like <code>flatMap()</code> come in handly</p>
 
 <h4>Enter the FlatMap</h4>
-<div class="highlight"><pre><code class="language-java" data-lang="java">  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">printTitlesUsingFlatMap</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">names</span><span class="o">)</span> <span class="o">{</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span>  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">printTitlesUsingFlatMap</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">names</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">Observable</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">names</span><span class="o">)</span>
-              <span class="o">.</span><span class="na">flatMap</span><span class="o">(</span><span class="nl">Printer:</span><span class="o">:</span><span class="n">getTitleObservable</span><span class="o">)</span>
+              <span class="o">.</span><span class="na">flatMap</span><span class="o">(</span><span class="n">Printer</span><span class="o">::</span><span class="n">getTitleObservable</span><span class="o">)</span>
               <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
   <span class="o">}</span>
 
@@ -201,13 +201,13 @@
 </code></pre></div>
 <p>Notice that we are calling <code>subscriber.onComplete()</code> for every name. Guess the output... guessed it? Now have a look<br>
 Output :</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>onNext: John - 4
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a name="line-1"></a>onNext: John - 4
 <a name="line-2"></a>onNext: Samuel - 6
 <a name="line-3"></a>onNext: Tom - 3
 <a name="line-4"></a>onCompleted
 </code></pre></div>
 <p>Is that what you expected? Probably not. Now have a look at what happens if don&#39;t call <code>subscriber.onComplete()</code> when there is an exception.</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java">  <span class="k">return</span> <span class="n">Observable</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">subscriber</span> <span class="o">-&gt;</span> <span class="o">{</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span>  <span class="k">return</span> <span class="n">Observable</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">subscriber</span> <span class="o">-&gt;</span> <span class="o">{</span>
       <span class="k">if</span><span class="o">(!</span><span class="n">subscriber</span><span class="o">.</span><span class="na">isUnsubscribed</span><span class="o">())</span> <span class="o">{</span>
           <span class="k">try</span> <span class="o">{</span>
               <span class="n">subscriber</span><span class="o">.</span><span class="na">onNext</span><span class="o">(</span><span class="n">getTitle</span><span class="o">(</span><span class="n">name</span><span class="o">));</span>
@@ -219,7 +219,7 @@ Output :</p>
   <span class="o">});</span>
 </code></pre></div>
 <p>Make a guess before you look at the output.</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>onNext: John - 4
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a name="line-1"></a>onNext: John - 4
 <a name="line-2"></a>onNext: Samuel - 6
 <a name="line-3"></a>onNext: Tom - 3
 </code></pre></div>
@@ -244,7 +244,7 @@ It calls <code>onComplete()</code> only when all the observables are <em>complet
 <h3>EDIT</h3>
 
 <p><a href="http://artemzin.com/blog/rxjava-defer-execution-of-function-via-fromcallable/">Artem Zinnatullin</a>&#39;s post suggests a better way to for our getTitleObservable().</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><a name="line-1"></a><span class="k">return</span> <span class="n">Observable</span><span class="o">.</span><span class="na">fromCallable</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">getTitle</span><span class="o">(</span><span class="n">name</span><span class="o">));</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><a name="line-1"></a><span class="k">return</span> <span class="n">Observable</span><span class="o">.</span><span class="na">fromCallable</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">getTitle</span><span class="o">(</span><span class="n">name</span><span class="o">));</span>
 </code></pre></div>
 <p>By using this method, you don&#39;t need to worry about calling the right functions to the subscriber. Thanks to <a href="https://www.reddit.com/r/androiddev/comments/3u5w0c/if_you_are_writing_observablecreate_theres_a_big/">pakoito</a> for pointing that out.</p>
 

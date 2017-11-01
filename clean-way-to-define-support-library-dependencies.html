@@ -102,7 +102,7 @@
             <h1 class="post-title">Clean way to define support library dependencies</h1>
             <section class="post-meta">
             <!-- <a href=''>Manideep Polireddi</a> -->
-            <time class="post-date" datetime="2015-11-24">24 Nov 2015</time>
+            <time class="post-date" datetime="2015-11-23">23 Nov 2015</time>
                 <!-- [[tags prefix=" on "]] -->
                  
                 on 
@@ -120,7 +120,7 @@
         <section class="post-content">
             
             <p>As the support library started getting bigger with more tools in it, the team at google have suggested developers to pick and choose the individual pieces of the library in their dependencies. More recently our <code>build.gradle</code> files started to look like this</p>
-<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><a name="line-1"></a><span class="n">dependencies</span> <span class="o">{</span>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="n">dependencies</span> <span class="o">{</span>
 <a name="line-2"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:appcompat-v7:23.1.0&#39;</span>
 <a name="line-3"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:design:23.1.0&#39;</span>
 <a name="line-4"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:pallete-v7:23.1.0&#39;</span>
@@ -128,7 +128,7 @@
 <a name="line-6"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:recyclerview-v7:23.1.0&#39;</span>
 <a name="line-7"></a><span class="o">}</span>
 </code></pre></div>
-<p>So when a new release comes out, we have to change the version number in every single line. Chris Banes, from the Android developer relations team, in <a href="https://www.youtube.com/watch?v=ihQ16K8gSuQ&amp;t=17m58s">Android Dev Summit 2015</a> has given this great tip to solve this problem.</p>
+<p>So when a new release comes out, we have to change the version number in every single line. Chris Banes, from the Android developer relations team, in <a href="https://www.youtube.com/watch?v=ihQ16K8gSuQ&t=17m58s">Android Dev Summit 2015</a> has given this great tip to solve this problem.</p>
 
 <blockquote class="twitter-tweet" lang="en"><p lang="en" dir="ltr">This! <a href="https://twitter.com/hashtag/AndroidDev?src=hash">#AndroidDev</a> <a href="https://twitter.com/hashtag/AndroidDevSummit?src=hash">#AndroidDevSummit</a>&#10;🙏 <a href="https://twitter.com/chrisbanes">@chrisbanes</a> <a href="https://t.co/v47Pm74ohj">pic.twitter.com/v47Pm74ohj</a></p>&mdash; Manideep Polireddi (@okmanideep) <a href="https://twitter.com/okmanideep/status/669195097947377664">November 24, 2015</a></blockquote>
 
@@ -142,7 +142,7 @@
 <p>If you haven&#39;t noticed yet, you should use <strong>double quotes</strong></p>
 
 <p>So the final code looks like this</p>
-<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><a name="line-1"></a><span class="n">ext</span> <span class="o">{</span>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="n">ext</span> <span class="o">{</span>
 <a name="line-2"></a>    <span class="n">supportLibVersion</span> <span class="o">=</span> <span class="s1">&#39;23.1.1&#39;</span>
 <a name="line-3"></a><span class="o">}</span>
 <a name="line-4"></a>

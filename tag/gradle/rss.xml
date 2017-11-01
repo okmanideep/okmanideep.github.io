@@ -27,7 +27,7 @@
 <h4>The minSdk 21 trick</h4>
 
 <p>It doesn&#39;t matter your app is over the 65K method limit or not, enabling multiDex and having product flavors like this help a lot.  </p>
-<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><a name="line-1"></a><span class="n">productFlavors</span> <span class="o">{</span>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="n">productFlavors</span> <span class="o">{</span>
 <a name="line-2"></a>    <span class="n">dev</span> <span class="o">{</span>
 <a name="line-3"></a>        <span class="n">multiDexEnabled</span> <span class="kc">true</span>
 <a name="line-4"></a>        <span class="n">minSdkVersion</span> <span class="mi">21</span>
@@ -50,10 +50,10 @@
 <p>Using a daemon essentially means, gradle keeps a JVM and gradle instance running after the first build and reuses the same for subsequent builds. Android Studio <strong>already uses a daemon</strong> for every build that is triggered from the IDE, but this is very useful for builds triggered from the command line.</p>
 
 <p><strong>Dry Run</strong> without daemon</p>
-<div class="highlight"><pre><code class="language-sh" data-lang="sh"><a name="line-1"></a>./gradlew :app:assembleDebug --dry-run
+<div class="highlight"><pre><code class="language-sh" data-lang="sh"><span></span><a name="line-1"></a>./gradlew :app:assembleDebug --dry-run
 </code></pre></div>
 <p>Output:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>BUILD SUCCESSFUL
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a name="line-1"></a>BUILD SUCCESSFUL
 <a name="line-2"></a>
 <a name="line-3"></a>Total time: 11.657 secs
 <a name="line-4"></a>
@@ -62,10 +62,10 @@
 <h4>Enabling gradle daemon</h4>
 
 <p>In your <code>~/.gradle/gradle.properties</code></p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>org.gradle.daemon=true
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a name="line-1"></a>org.gradle.daemon=true
 </code></pre></div>
 <p><strong>Dry Run output after enabling daemon</strong></p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>BUILD SUCCESSFUL
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a name="line-1"></a>BUILD SUCCESSFUL
 <a name="line-2"></a>
 <a name="line-3"></a>Total time: 1.757 secs
 </code></pre></div>
@@ -92,14 +92,14 @@ Edit <code>gradle-wrapper.properties</code> and upgrade gradle <code>distributio
 
 <p>If you have modules that are standalone, you can improve the build time a bit by enabling parallel execution.<br>
 In your <code>./gradle/gradle.properties</code> or <code>&lt;Project Root&gt;/gradle.properties</code>, add this line</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><a name="line-1"></a>org.gradle.parallel=true
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a name="line-1"></a>org.gradle.parallel=true
 </code></pre></div>
 <h2>Common Pitfalls</h2>
 
 <h4>Dynamic dependencies</h4>
 
 <p>Use definite version numbers for your dependencies in your gradle</p>
-<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><a name="line-1"></a><span class="c1">//Do NOT do this</span>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="c1">//Do NOT do this</span>
 <a name="line-2"></a><span class="n">compile</span> <span class="s1">&#39;com.google.code.gson:gson:2.+&#39;</span>
 <a name="line-3"></a>
 <a name="line-4"></a><span class="c1">//Do this instead</span>
@@ -110,7 +110,7 @@ In your <code>./gradle/gradle.properties</code> or <code>&lt;Project Root&gt;/gr
 <h4>Avoid heavy computation</h4>
 
 <p>You can find snippets like this on stack overflow that aim to make versioning easier for you</p>
-<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><a name="line-1"></a><span class="kt">def</span> <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;git rev-list HEAD --first-parent --count&#39;</span>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="kt">def</span> <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;git rev-list HEAD --first-parent --count&#39;</span>
 <a name="line-2"></a><span class="kt">def</span> <span class="n">gitVersion</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="na">execute</span><span class="o">().</span><span class="na">text</span><span class="o">.</span><span class="na">trim</span><span class="o">().</span><span class="na">toInteger</span><span class="o">()</span>
 <a name="line-3"></a>
 <a name="line-4"></a><span class="n">android</span> <span class="o">{</span>
