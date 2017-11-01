@@ -60,7 +60,7 @@ assets:
         automatic_img_size: false
 
 # gems and other configs
-gems:
+plugins:
     - jekyll-paginate
     - jekyll-feed
     - jekyll-assets
