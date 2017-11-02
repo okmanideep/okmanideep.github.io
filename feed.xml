@@ -1,12 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="https://okmanideep.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://okmanideep.github.io/" rel="alternate" type="text/html" /><updated>2017-11-02T12:25:34+05:30</updated><id>https://okmanideep.github.io/</id><title type="html">Blog | Manideep</title><subtitle>Android · Development · Design</subtitle><author><name>Manideep Polireddi</name></author><entry><title type="html">Dependency management in multi-module gradle projects</title><link href="https://okmanideep.github.io/dependency-management-in-multi-module-gradle-projects" rel="alternate" type="text/html" title="Dependency management in multi-module gradle projects" /><published>2017-11-02T05:50:00+05:30</published><updated>2017-11-02T05:50:00+05:30</updated><id>https://okmanideep.github.io/dependency-management-in-multi-module-gradle-projects</id><content type="html" xml:base="https://okmanideep.github.io/dependency-management-in-multi-module-gradle-projects">&lt;p&gt;These are the issues I will be addressing here:&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="https://okmanideep.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://okmanideep.github.io/" rel="alternate" type="text/html" /><updated>2017-11-02T18:38:42+05:30</updated><id>https://okmanideep.github.io/</id><title type="html">Blog | Manideep</title><subtitle>Android · Development · Design</subtitle><author><name>Manideep Polireddi</name></author><entry><title type="html">Dependency management in multi-module gradle projects</title><link href="https://okmanideep.github.io/dependency-management-in-multi-module-gradle-projects" rel="alternate" type="text/html" title="Dependency management in multi-module gradle projects" /><published>2017-11-02T05:50:00+05:30</published><updated>2017-11-02T05:50:00+05:30</updated><id>https://okmanideep.github.io/dependency-management-in-multi-module-gradle-projects</id><content type="html" xml:base="https://okmanideep.github.io/dependency-management-in-multi-module-gradle-projects">&lt;p&gt;Google&amp;#39;s approach in &lt;a href=&quot;https://github.com/googlesamples/android-architecture-components/&quot;&gt;this google samples repo&lt;/a&gt; seems to be tackling it very well. They actually do it across multiple projects but it applies for multiple modules as well. If you just have one module, don&amp;#39;t bother doing this right now, but remember to do it when you decide to extract a module out.&lt;/p&gt;
+
+&lt;p&gt;Our main objectives are to&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;Make it easy to read or update versions of the dependencies&lt;/li&gt;
-&lt;li&gt;Maintain consistency for dependency versions across all modules&lt;/li&gt;
-&lt;li&gt;Minimise the effort required to declare dependencies when extracting or adding a new module&lt;/li&gt;
+&lt;li&gt;Minimise the effort required to update dependecies&lt;/li&gt;
+&lt;li&gt;Maintain consistency in dependency versions across modules&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2&gt;Step 1&lt;/h2&gt;
+&lt;h2&gt;What to do?&lt;/h2&gt;
+
+&lt;h4&gt;Step 1&lt;/h4&gt;
 
 &lt;p&gt;Declare your dependencies and versions at the root of the project.&lt;/p&gt;
 
@@ -34,9 +37,9 @@
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Attaching &lt;code&gt;versions&lt;/code&gt; and &lt;code&gt;deps&lt;/code&gt; to extra user properties &lt;code&gt;ext&lt;/code&gt; will allow you to access those variables all across the project&lt;/p&gt;
 
-&lt;h2&gt;Step 2&lt;/h2&gt;
+&lt;h4&gt;Step 2&lt;/h4&gt;
 
-&lt;p&gt;Import the definitions in the root project&amp;#39;s &lt;code&gt;buildScript&lt;/code&gt; block&lt;/p&gt;
+&lt;p&gt;Import the definitions at the top of root project&amp;#39;s &lt;code&gt;buildScript&lt;/code&gt; block&lt;/p&gt;
 
 &lt;p&gt;&lt;code&gt;$PROJECT_ROOT/build.gradle&lt;/code&gt;&lt;/p&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-groovy&quot; data-lang=&quot;groovy&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;a name=&quot;line-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;n&quot;&gt;buildScript&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
@@ -45,7 +48,7 @@
 &lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;c1&quot;&gt;//left out for brevity...&lt;/span&gt;
 &lt;a name=&quot;line-5&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h2&gt;Final step&lt;/h2&gt;
+&lt;h4&gt;Final step&lt;/h4&gt;
 
 &lt;p&gt;Declare your module dependencies using the variables defined&lt;/p&gt;
 
@@ -56,7 +59,24 @@
 &lt;a name=&quot;line-4&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;n&quot;&gt;implementation&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deps&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;support_lib&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;recycler_view&lt;/span&gt;
 &lt;a name=&quot;line-5&quot;&gt;&lt;/a&gt;  &lt;span class=&quot;n&quot;&gt;implementation&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deps&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;gson&lt;/span&gt;
 &lt;a name=&quot;line-6&quot;&gt;&lt;/a&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><author><name>Manideep Polireddi</name></author><category term="android" /><category term="gradle" /><summary type="html">These are the issues I will be addressing here:</summary></entry><entry><title type="html">Improve your Android build times</title><link href="https://okmanideep.github.io/improve-android-build-times" rel="alternate" type="text/html" title="Improve your Android build times" /><published>2016-04-06T01:40:00+05:30</published><updated>2016-04-06T01:40:00+05:30</updated><id>https://okmanideep.github.io/improve-android-build-times</id><content type="html" xml:base="https://okmanideep.github.io/improve-android-build-times">&lt;p&gt;If you have the time to watch the video, go ahead. &lt;a href=&quot;https://twitter.com/madisp&quot;&gt;Madis Pink&lt;/a&gt; goes over each optimisation you can do very carefully and how you can profile the gradle build process to identify the bottlenecks of your builds. If not, go ahead do the changes mentioned below, which will take less than two minutes and enjoy a much smaller build times.&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;Approach&lt;/h2&gt;
+
+&lt;p&gt;All we have done is &lt;strong&gt;remove duplication&lt;/strong&gt; by reusing the version and dependency declarations done at one single place. Since all modules point to the same declaration, they all are in sync. And since there is only one declaration per dependency in the project, it is easy to find and update that one dependency.&lt;/p&gt;
+
+&lt;h2&gt;IntelliJ doesn&amp;#39;t help you much here&lt;/h2&gt;
+
+&lt;h4&gt;Make your variable names easier to debug&lt;/h4&gt;
+
+&lt;p&gt;Once you declare the variables, IntelliJ doesn&amp;#39;t auto complete or suggest them else where when you are editing the gradle files. So make sure your variable name usages are proper and easily debuggable. That is intension behind using camel case here(YMMV).&lt;/p&gt;
+
+&lt;h4&gt;Do not change all the dependencies at once&lt;/h4&gt;
+
+&lt;p&gt;The error messages are not specific enough to figure out which variable name of dependency path you messed up. You can go ahead and define all the variables at once but add/use them one by one and sync your gradle file after each step to avoid frustrating debugging sessions.&lt;/p&gt;
+
+&lt;h2&gt;Feedback&lt;/h2&gt;
+
+&lt;p&gt;What do you think of this approach? Is there a better way? I am actually curious how this changes when we use kotlin to write gradle files. &lt;a href=&quot;https://twitter.com/okmanideep&quot;&gt;Let me know&lt;/a&gt; your feedback.&lt;/p&gt;</content><author><name>Manideep Polireddi</name></author><category term="android" /><category term="gradle" /><summary type="html">Google&amp;#39;s approach in this google samples repo seems to be tackling it very well. They actually do it across multiple projects but it applies for multiple modules as well. If you just have one module, don&amp;#39;t bother doing this right now, but remember to do it when you decide to extract a module out.</summary></entry><entry><title type="html">Improve your Android build times</title><link href="https://okmanideep.github.io/improve-android-build-times" rel="alternate" type="text/html" title="Improve your Android build times" /><published>2016-04-06T01:40:00+05:30</published><updated>2016-04-06T01:40:00+05:30</updated><id>https://okmanideep.github.io/improve-android-build-times</id><content type="html" xml:base="https://okmanideep.github.io/improve-android-build-times">&lt;p&gt;If you have the time to watch the video, go ahead. &lt;a href=&quot;https://twitter.com/madisp&quot;&gt;Madis Pink&lt;/a&gt; goes over each optimisation you can do very carefully and how you can profile the gradle build process to identify the bottlenecks of your builds. If not, go ahead do the changes mentioned below, which will take less than two minutes and enjoy a much smaller build times.&lt;/p&gt;
 
 &lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/AbNhen_zn-c&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;
 

@@ -18,15 +18,18 @@
 	  <pubDate>2017-11-02T05:50:00+05:30</pubDate>
 	  <guid>/dependency-management-in-multi-module-gradle-projects</guid>
 	  <description><![CDATA[
-	     <p>These are the issues I will be addressing here:</p>
+	     <p>Google&#39;s approach in <a href="https://github.com/googlesamples/android-architecture-components/">this google samples repo</a> seems to be tackling it very well. They actually do it across multiple projects but it applies for multiple modules as well. If you just have one module, don&#39;t bother doing this right now, but remember to do it when you decide to extract a module out.</p>
+
+<p>Our main objectives are to</p>
 
 <ul>
-<li>Make it easy to read or update versions of the dependencies</li>
-<li>Maintain consistency for dependency versions across all modules</li>
-<li>Minimise the effort required to declare dependencies when extracting or adding a new module</li>
+<li>Minimise the effort required to update dependecies</li>
+<li>Maintain consistency in dependency versions across modules</li>
 </ul>
 
-<h2>Step 1</h2>
+<h2>What to do?</h2>
+
+<h4>Step 1</h4>
 
 <p>Declare your dependencies and versions at the root of the project.</p>
 
@@ -54,9 +57,9 @@
 </code></pre></div>
 <p>Attaching <code>versions</code> and <code>deps</code> to extra user properties <code>ext</code> will allow you to access those variables all across the project</p>
 
-<h2>Step 2</h2>
+<h4>Step 2</h4>
 
-<p>Import the definitions in the root project&#39;s <code>buildScript</code> block</p>
+<p>Import the definitions at the top of root project&#39;s <code>buildScript</code> block</p>
 
 <p><code>$PROJECT_ROOT/build.gradle</code></p>
 <div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="n">buildScript</span> <span class="o">{</span>
@@ -65,7 +68,7 @@
 <a name="line-4"></a>  <span class="c1">//left out for brevity...</span>
 <a name="line-5"></a><span class="o">}</span>
 </code></pre></div>
-<h2>Final step</h2>
+<h4>Final step</h4>
 
 <p>Declare your module dependencies using the variables defined</p>
 
@@ -77,6 +80,24 @@
 <a name="line-5"></a>  <span class="n">implementation</span> <span class="n">deps</span><span class="o">.</span><span class="na">gson</span>
 <a name="line-6"></a><span class="o">}</span>
 </code></pre></div>
+<h2>Approach</h2>
+
+<p>All we have done is <strong>remove duplication</strong> by reusing the version and dependency declarations done at one single place. Since all modules point to the same declaration, they all are in sync. And since there is only one declaration per dependency in the project, it is easy to find and update that one dependency.</p>
+
+<h2>IntelliJ doesn&#39;t help you much here</h2>
+
+<h4>Make your variable names easier to debug</h4>
+
+<p>Once you declare the variables, IntelliJ doesn&#39;t auto complete or suggest them else where when you are editing the gradle files. So make sure your variable name usages are proper and easily debuggable. That is intension behind using camel case here(YMMV).</p>
+
+<h4>Do not change all the dependencies at once</h4>
+
+<p>The error messages are not specific enough to figure out which variable name of dependency path you messed up. You can go ahead and define all the variables at once but add/use them one by one and sync your gradle file after each step to avoid frustrating debugging sessions.</p>
+
+<h2>Feedback</h2>
+
+<p>What do you think of this approach? Is there a better way? I am actually curious how this changes when we use kotlin to write gradle files. <a href="https://twitter.com/okmanideep">Let me know</a> your feedback.</p>
+
 	  ]]></description>
 	</item>
 
