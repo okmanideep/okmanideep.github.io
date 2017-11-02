@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- [[! Page Meta ]] -->
-    <title>Blog | Manideep</title>
+    <title>Author</title>
     <meta name="description" content="Blog | Manideep - Android · Development · Design" />
 
     <meta name="HandheldFriendly" content="True" />
@@ -25,17 +25,17 @@
 
     <meta property="og:site_name" content="Blog | Manideep" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Blog | Manideep" />
+    <meta property="og:title" content="Author" />
     <meta property="og:description" content="Android · Development · Design" />
-    <meta property="og:url" content="https://okmanideep.github.io/tag/gradle/" />
-    <meta property="og:image" content="https://okmanideep.github.iocover2.jpg" />
+    <meta property="og:url" content="https://okmanideep.github.io/author/okmanideep/page2/" />
+    <meta property="og:image" content="https://okmanideep.github.io/assets/logo_fb-f0496ce9ac22d679cd89359c44a58ed65cd34aaefaa811c2b2a4334c105a140d.jpg" />
     <meta property="og:locale" content="en_US" />
     <meta property="article:author" content="https://www.facebook.com/manideepiitb">
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Blog | Manideep" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Author" />
     <meta name="twitter:description" content="Android · Development · Design" />
-    <meta name="twitter:image" content="https://okmanideep.github.iocover2.jpg" />
+    <meta name="twitter:image" content="https://okmanideep.github.io/assets/logo_black_square-e3783420100f3db97c5f11badb0484f43bbfc54487fda2a0bb7791d2e68252e9.png" />
     <meta name="twitter:author" content="@okmanideep">
 
     <script type="application/ld+json">
@@ -54,7 +54,7 @@
 
 
 </head>
-<body class="tag-template nav-closed">
+<body class="paged archive-template nav-closed">
 
     <div class="nav">
     <h3 class="nav-title">Menu</h3>
@@ -67,7 +67,7 @@
         <li class="nav-fables " role="presentation"><a href="tag/fables/">Fables</a></li>
         <li class="nav-speeches " role="presentation"><a href="tag/speeches/">Speeches</a></li>
         <li class="nav-fiction " role="presentation"><a href="tag/fiction/">Fiction</a></li>-->
-        <li class="nav-author " role="presentation"><a href="author/okmanideep/">Author</a></li>
+        <li class="nav-author  nav-current" role="presentation"><a href="author/okmanideep/">Author</a></li>
     </ul>
     <a class="subscribe-button icon-feed" href="feed.xml">Subscribe</a>
 </div>
@@ -77,42 +77,56 @@
     <div class="site-wrapper">
 
         <!-- [[! Everything else gets inserted here ]] -->
-        <!-- < dynamically overriding backgrounds for tags as well as descriptions -->
-
-
-<!-- < default}} -->
+        <!-- < default}} -->
 <!-- The tag above means - insert everything in this file into the [body] of the default.hbs template -->
 
-<!-- If we have a tag cover, display that - else blog cover - else nothing -->
-<header class="main-header tag-head " style="background-image: url(cover2.jpg) ">
-    <nav class="main-nav overlay clearfix">
-        <a class="blog-logo" href=""><img src="/assets/ghost-8386e20599db9d850f468b82ded62a918039667c27b1190e1cf2e07139147b9e.png" alt="Blog Logo"></a>
-        
-            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
-        
-    </nav>
-    <div class="vertical">
-        <div class="main-header-content inner">
-            <h1 class="page-title">Gradle</h1>
-            <h2 class="page-description">
+<!-- The big featured header -->
+
+<!-- Everything inside the #author tags pulls data from the author -->
+<!-- #author  -->
+    <header class="main-header author-head no-cover">
+        <nav class="main-nav overlay clearfix">
+            <a class="blog-logo" href="/"><img src="/assets/logo_black-e492ce6d683ab7ad291843c9ca39fe242daa139336311d97ef7a497205882578.png" alt="Blog Logo"></a>
             
-			    A 2-post collection
+                <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
             
-            </h2>
+        </nav>
+    </header>
+
+    <section class="author-profile inner">
+        
+        <figure class="author-image">
+            <div class="img" style="background-image: url(/assets/okmanideep-34d7c885397d7187bfe366f2bba160dc2b3d389d196afe2d95a236ec6a751196.jpg)"><span class="hidden">Manideep Polireddi's Picture</span></div>
+        </figure>
+        
+        <h1 class="author-title">Manideep Polireddi</h1>
+        
+            <h2 class="author-bio">Android developer · Design Enthusiast</h2>
+        
+        <div class="author-meta">
+            <span class="author-location icon-location">Mumbai, India</span>
+            <!-- <span class="author-link icon-link"><a href="https://okmanideep.github.io">okmanideep.github.io/</a></span> -->
+            <span class="author-twitter icon-twitter"><a href="https://twitter.com/okmanideep">@okmanideep</a></span>
+            <!-- <span class="author-stats"><i class="icon-stats"></i> [[plural ../pagination.total empty='No posts' singular='% post' plural='% posts']]</span> -->
+            <span class="author-stats"><i class="icon-stats"></i>6 posts</span>
         </div>
-    </div>
-</header>
+    </section>
+<!-- /author -->
 
 <!-- The main content area on the homepage -->
 <main id="content" class="content" role="main">
 
-    <!-- The tag below includes the post loop - partials/loop.hbs -->
+    <!-- The tag below includes the post loop - partials/loop.hbs  -->
         <!-- Previous/next page links - only displayed on page 2+ -->
     <div class="extra-pagination inner">
         
             <nav class="pagination" role="pagination">
     
-    <span class="page-number"> Page 1 of 1 </span>
+        
+            <a class="newer-posts" href="author/okmanideep" title="Previous Page">&laquo; Newer Posts</a>
+        
+    
+    <span class="page-number"> Page 2 of 2 </span>
      
 </nav>
         
@@ -122,10 +136,10 @@
     
     <article class="post">
         <header class="post-header">
-            <h2 class="post-title"><a href="/dependency-management-in-multi-module-gradle-projects">Dependency management in multi-module gradle projects</a></h2>
+            <h2 class="post-title"><a href="/permissions-in-marshmallow">Permissions in marshmallow</a></h2>
         </header>
         <section class="post-excerpt">
-            <p><p>These are the issues I will be addressing here:</p> <ul> <li>Make it easy to read or update versions of the dependencies</li> <li>Maintain consistency for dependency versions... <a class="read-more" href="/dependency-management-in-multi-module-gradle-projects">&raquo;</a></p>
+            <p><p>I expect you to first go and have a look at this page in the <a href="http://developer.android.com/training/permissions/requesting.html">Android Bible</a> about permissions in marshmallow. Especially have a look... <a class="read-more" href="/permissions-in-marshmallow">&raquo;</a></p>
         </section>
         <footer class="post-meta">
             <img src="/assets/okmanideep-34d7c885397d7187bfe366f2bba160dc2b3d389d196afe2d95a236ec6a751196.jpg" alt="Site Image" nopin="nopin" class="author-thumb">
@@ -136,43 +150,11 @@
                 on 
                 
                     
-                       <a href='tag/android'>Android</a>,
-                       
-                
-                    
-                       <a href='tag/gradle'>Gradle</a>
+                       <a href='tag/android'>Android</a>
                        
                 
             
-            <time class="post-date" datetime="2017-11-02">02 Nov 2017</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/improve-android-build-times">Improve your Android build times</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p><p>If you have the time to watch the video, go ahead. <a href="https://twitter.com/madisp">Madis Pink</a> goes over each optimisation you can do very carefully and how you... <a class="read-more" href="/improve-android-build-times">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            <img src="/assets/okmanideep-34d7c885397d7187bfe366f2bba160dc2b3d389d196afe2d95a236ec6a751196.jpg" alt="Site Image" nopin="nopin" class="author-thumb">
-            <!-- author -->
-            <a href='/author/okmanideep'>Manideep Polireddi</a>
-            <!-- [[tags prefix=" on "]] -->
-             
-                on 
-                
-                    
-                       <a href='tag/android'>Android</a>,
-                       
-                
-                    
-                       <a href='tag/gradle'>Gradle</a>
-                       
-                
-            
-            <time class="post-date" datetime="2016-04-05">06 Apr 2016</time>
+            <time class="post-date" datetime="2015-11-14">15 Nov 2015</time>
         </footer>
     </article>
     
@@ -181,7 +163,11 @@
     
         <nav class="pagination" role="pagination">
     
-    <span class="page-number"> Page 1 of 1 </span>
+        
+            <a class="newer-posts" href="author/okmanideep" title="Previous Page">&laquo; Newer Posts</a>
+        
+    
+    <span class="page-number"> Page 2 of 2 </span>
      
 </nav>
     

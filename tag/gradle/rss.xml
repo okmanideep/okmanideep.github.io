@@ -12,6 +12,75 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>Dependency management in multi-module gradle projects</title>
+	  <link>/dependency-management-in-multi-module-gradle-projects</link>
+	  <author>Manideep Polireddi</author>
+	  <pubDate>2017-11-02T05:50:00+05:30</pubDate>
+	  <guid>/dependency-management-in-multi-module-gradle-projects</guid>
+	  <description><![CDATA[
+	     <p>These are the issues I will be addressing here:</p>
+
+<ul>
+<li>Make it easy to read or update versions of the dependencies</li>
+<li>Maintain consistency for dependency versions across all modules</li>
+<li>Minimise the effort required to declare dependencies when extracting or adding a new module</li>
+</ul>
+
+<h2>Step 1</h2>
+
+<p>Declare your dependencies and versions at the root of the project.</p>
+
+<p><code>$PROJECT_ROOT/dependencies.gradle</code></p>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="n">ext</span><span class="o">.</span><span class="na">versions</span> <span class="o">=</span> <span class="o">[:]</span>
+<a name="line-2"></a>
+<a name="line-3"></a><span class="kt">def</span> <span class="n">versions</span> <span class="o">=</span> <span class="o">[:]</span>
+<a name="line-4"></a>
+<a name="line-5"></a><span class="n">versions</span><span class="o">.</span><span class="na">support_lib</span> <span class="o">=</span> <span class="s1">&#39;26.0.2&#39;</span>
+<a name="line-6"></a><span class="n">versions</span><span class="o">.</span><span class="na">gson</span> <span class="o">=</span> <span class="s1">&#39;2.8.0&#39;</span>
+<a name="line-7"></a>
+<a name="line-8"></a><span class="n">ext</span><span class="o">.</span><span class="na">versions</span> <span class="o">=</span> <span class="n">versions</span>
+<a name="line-9"></a>
+<a name="line-10"></a><span class="n">ext</span><span class="o">.</span><span class="na">deps</span> <span class="o">=</span> <span class="o">[:]</span>
+<a name="line-11"></a><span class="kt">def</span> <span class="n">deps</span> <span class="o">=</span> <span class="o">[:]</span>
+<a name="line-12"></a>
+<a name="line-13"></a><span class="kt">def</span> <span class="n">support_lib</span> <span class="o">=</span> <span class="o">[:]</span>
+<a name="line-14"></a><span class="n">support_lib</span><span class="o">.</span><span class="na">app_compat</span> <span class="o">=</span> <span class="s2">&quot;com.android.support:appcompat-v7:$versions.support_lib&quot;</span>
+<a name="line-15"></a><span class="n">support_lib</span><span class="o">.</span><span class="na">recycler_view</span> <span class="o">=</span> <span class="s2">&quot;com.android.support:recyclerview-v7:$versions.support_lib&quot;</span>
+<a name="line-16"></a><span class="n">deps</span><span class="o">.</span><span class="na">support_lib</span> <span class="o">=</span> <span class="n">support_lib</span>
+<a name="line-17"></a>
+<a name="line-18"></a><span class="n">deps</span><span class="o">.</span><span class="na">gson</span> <span class="o">=</span> <span class="s2">&quot;com.google.code.gson:gson:$versions.gson&quot;</span>
+<a name="line-19"></a>
+<a name="line-20"></a><span class="n">ext</span><span class="o">.</span><span class="na">deps</span> <span class="o">=</span> <span class="n">deps</span>
+</code></pre></div>
+<p>Attaching <code>versions</code> and <code>deps</code> to extra user properties <code>ext</code> will allow you to access those variables all across the project</p>
+
+<h2>Step 2</h2>
+
+<p>Import the definitions in the root project&#39;s <code>buildScript</code> block</p>
+
+<p><code>$PROJECT_ROOT/build.gradle</code></p>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="n">buildScript</span> <span class="o">{</span>
+<a name="line-2"></a>  <span class="n">apply</span> <span class="nl">from:</span> <span class="s1">&#39;dependencies.gradle&#39;</span>
+<a name="line-3"></a>
+<a name="line-4"></a>  <span class="c1">//left out for brevity...</span>
+<a name="line-5"></a><span class="o">}</span>
+</code></pre></div>
+<h2>Final step</h2>
+
+<p>Declare your module dependencies using the variables defined</p>
+
+<p><code>$PROJECT_ROOT/my-module/build.gradle</code></p>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="c1">//left for brevity...</span>
+<a name="line-2"></a><span class="n">dependecies</span> <span class="o">{</span>
+<a name="line-3"></a>  <span class="n">implementation</span> <span class="n">deps</span><span class="o">.</span><span class="na">support_lib</span><span class="o">.</span><span class="na">app_compat</span>
+<a name="line-4"></a>  <span class="n">implementation</span> <span class="n">deps</span><span class="o">.</span><span class="na">support_lib</span><span class="o">.</span><span class="na">recycler_view</span>
+<a name="line-5"></a>  <span class="n">implementation</span> <span class="n">deps</span><span class="o">.</span><span class="na">gson</span>
+<a name="line-6"></a><span class="o">}</span>
+</code></pre></div>
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>Improve your Android build times</title>
 	  <link>/improve-android-build-times</link>
 	  <author>Manideep Polireddi</author>
