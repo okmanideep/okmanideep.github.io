@@ -120,13 +120,13 @@
         <section class="post-content">
             
             <p>As the support library started getting bigger with more tools in it, the team at google have suggested developers to pick and choose the individual pieces of the library in their dependencies. More recently our <code>build.gradle</code> files started to look like this</p>
-<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="n">dependencies</span> <span class="o">{</span>
-<a name="line-2"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:appcompat-v7:23.1.0&#39;</span>
-<a name="line-3"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:design:23.1.0&#39;</span>
-<a name="line-4"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:pallete-v7:23.1.0&#39;</span>
-<a name="line-5"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:cardview-v7:23.1.0&#39;</span>
-<a name="line-6"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:recyclerview-v7:23.1.0&#39;</span>
-<a name="line-7"></a><span class="o">}</span>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a id="line-1" name="line-1"></a><span class="n">dependencies</span> <span class="o">{</span>
+<a id="line-2" name="line-2"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:appcompat-v7:23.1.0&#39;</span>
+<a id="line-3" name="line-3"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:design:23.1.0&#39;</span>
+<a id="line-4" name="line-4"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:pallete-v7:23.1.0&#39;</span>
+<a id="line-5" name="line-5"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:cardview-v7:23.1.0&#39;</span>
+<a id="line-6" name="line-6"></a>    <span class="n">compile</span> <span class="s1">&#39;com.android.support:recyclerview-v7:23.1.0&#39;</span>
+<a id="line-7" name="line-7"></a><span class="o">}</span>
 </code></pre></div>
 <p>So when a new release comes out, we have to change the version number in every single line. Chris Banes, from the Android developer relations team, in <a href="https://www.youtube.com/watch?v=ihQ16K8gSuQ&t=17m58s">Android Dev Summit 2015</a> has given this great tip to solve this problem.</p>
 
@@ -142,17 +142,17 @@
 <p>If you haven&#39;t noticed yet, you should use <strong>double quotes</strong></p>
 
 <p>So the final code looks like this</p>
-<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="n">ext</span> <span class="o">{</span>
-<a name="line-2"></a>    <span class="n">supportLibVersion</span> <span class="o">=</span> <span class="s1">&#39;23.1.1&#39;</span>
-<a name="line-3"></a><span class="o">}</span>
-<a name="line-4"></a>
-<a name="line-5"></a><span class="n">dependencies</span> <span class="o">{</span>
-<a name="line-6"></a>    <span class="n">compile</span> <span class="s2">&quot;com.android.support:appcompat-v7:${supportLibVersion}&quot;</span>
-<a name="line-7"></a>    <span class="n">compile</span> <span class="s2">&quot;com.android.support:design:${supportLibVersion}&quot;</span>
-<a name="line-8"></a>    <span class="n">compile</span> <span class="s2">&quot;com.android.support:pallete-v7:${supportLibVersion}&quot;</span>
-<a name="line-9"></a>    <span class="n">compile</span> <span class="s2">&quot;com.android.support:cardview-v7:${supportLibVersion}&quot;</span>
-<a name="line-10"></a>    <span class="n">compile</span> <span class="s2">&quot;com.android.support:recyclerview-v7:${supportLibVersion}&quot;</span>
-<a name="line-11"></a><span class="o">}</span>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a id="line-1" name="line-1"></a><span class="n">ext</span> <span class="o">{</span>
+<a id="line-2" name="line-2"></a>    <span class="n">supportLibVersion</span> <span class="o">=</span> <span class="s1">&#39;23.1.1&#39;</span>
+<a id="line-3" name="line-3"></a><span class="o">}</span>
+<a id="line-4" name="line-4"></a>
+<a id="line-5" name="line-5"></a><span class="n">dependencies</span> <span class="o">{</span>
+<a id="line-6" name="line-6"></a>    <span class="n">compile</span> <span class="s2">&quot;com.android.support:appcompat-v7:${supportLibVersion}&quot;</span>
+<a id="line-7" name="line-7"></a>    <span class="n">compile</span> <span class="s2">&quot;com.android.support:design:${supportLibVersion}&quot;</span>
+<a id="line-8" name="line-8"></a>    <span class="n">compile</span> <span class="s2">&quot;com.android.support:pallete-v7:${supportLibVersion}&quot;</span>
+<a id="line-9" name="line-9"></a>    <span class="n">compile</span> <span class="s2">&quot;com.android.support:cardview-v7:${supportLibVersion}&quot;</span>
+<a id="line-10" name="line-10"></a>    <span class="n">compile</span> <span class="s2">&quot;com.android.support:recyclerview-v7:${supportLibVersion}&quot;</span>
+<a id="line-11" name="line-11"></a><span class="o">}</span>
 </code></pre></div>
 <p>By the way, Android Studio is intelligent enough that it will suggest you to update the version when there is a new one out, even in the above format. All hail IntelliJ.</p>
 
@@ -261,7 +261,7 @@ s.setAttribute('data-timestamp', +new Date());
 
 
         <footer class="site-footer clearfix">
-          <section class="copyright"><a href="/">Blog | Manideep</a> &copy; 2017</section>
+          <section class="copyright"><a href="/">Blog | Manideep</a> &copy; 2022</section>
           <section class="poweredby">Published with <a href="http://jekyllrb.com/">Jekyll</a></section>
         </footer>
     </div>

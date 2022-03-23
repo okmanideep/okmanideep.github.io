@@ -23,22 +23,22 @@
 <h2>Setting up pygments</h2>
 
 <p>In <code>_config.yml</code></p>
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span></span><a name="line-1"></a><span class="ss">markdown</span><span class="p">:</span> <span class="n">redcarpet</span>
-<a name="line-2"></a><span class="ss">redcarpet</span><span class="p">:</span>
-<a name="line-3"></a>    <span class="ss">extension</span><span class="p">:</span>
-<a name="line-4"></a>        <span class="o">-</span> <span class="n">fenced_code_blocks</span>
-<a name="line-5"></a><span class="ss">highlighter</span><span class="p">:</span> <span class="n">pygments</span>
-<a name="line-6"></a><span class="o">...</span>
-<a name="line-7"></a><span class="o">...</span>
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span></span><a id="line-1" name="line-1"></a><span class="ss">markdown</span><span class="p">:</span> <span class="n">redcarpet</span>
+<a id="line-2" name="line-2"></a><span class="ss">redcarpet</span><span class="p">:</span>
+<a id="line-3" name="line-3"></a>    <span class="ss">extension</span><span class="p">:</span>
+<a id="line-4" name="line-4"></a>        <span class="o">-</span> <span class="n">fenced_code_blocks</span>
+<a id="line-5" name="line-5"></a><span class="ss">highlighter</span><span class="p">:</span> <span class="n">pygments</span>
+<a id="line-6" name="line-6"></a><span class="o">...</span>
+<a id="line-7" name="line-7"></a><span class="o">...</span>
 </code></pre></div>
 <p>This sets <code>redcarpet</code> as our markdown parser and <code>pygments</code> as our code highlighter.<br>
 And <code>fenced_code_blocks</code> extension enables you to write code blocks like in Github flavoured markdown using ```  </p>
 
-<figure class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a name="True-1"></a>```css
-<a name="True-2"></a>.left {float: left;}
-<a name="True-3"></a>
-<a name="True-4"></a>.right {float: right;}
-<a name="True-5"></a>```</code></pre></figure>
+<figure class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="True-1" name="True-1"></a>```css
+<a id="True-2" name="True-2"></a>.left {float: left;}
+<a id="True-3" name="True-3"></a>
+<a id="True-4" name="True-4"></a>.right {float: right;}
+<a id="True-5" name="True-5"></a>```</code></pre></figure>
 
 <h2>Syntax highlighting</h2>
 
@@ -64,40 +64,40 @@ And <code>fenced_code_blocks</code> extension enables you to write code blocks l
 
 <p>To use this technique we should tell pygments to generate <code>lineanchors</code> for the code blocks. We can do this by using liquid template tags for our code blocks</p>
 
-<figure class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a name="True-1"></a>{% highlight css %}
-<a name="True-2"></a>.left {float: left;}
-<a name="True-3"></a>
-<a name="True-4"></a>.right {float: right;}
-<a name="True-5"></a>{% endhighlight %}</code></pre></figure>
+<figure class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="True-1" name="True-1"></a>{% highlight css %}
+<a id="True-2" name="True-2"></a>.left {float: left;}
+<a id="True-3" name="True-3"></a>
+<a id="True-4" name="True-4"></a>.right {float: right;}
+<a id="True-5" name="True-5"></a>{% endhighlight %}</code></pre></figure>
 
 <p>But we want to write our code block using ```<code>css</code>. We can do this by adding a custom redcarpet parser. Add this <code>redcarpet-custom.rb</code> file to your <code>_plugins</code> folder</p>
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span></span><a name="line-1"></a><span class="k">module</span> <span class="nn">Jekyll</span>
-<a name="line-2"></a>  <span class="k">module</span> <span class="nn">Converters</span>
-<a name="line-3"></a>    <span class="k">class</span> <span class="nc">Markdown</span>
-<a name="line-4"></a>      <span class="k">class</span> <span class="nc">RedcarpetParser</span>
-<a name="line-5"></a>        <span class="k">module</span> <span class="nn">WithPygments</span>
-<a name="line-6"></a>          <span class="kp">include</span> <span class="no">CommonMethods</span>
-<a name="line-7"></a>          <span class="k">def</span> <span class="nf">block_code</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
-<a name="line-8"></a>            <span class="nb">require</span> <span class="s1">&#39;pygments&#39;</span>
-<a name="line-9"></a>            <span class="n">lang</span> <span class="o">=</span> <span class="n">lang</span> <span class="o">&amp;&amp;</span> <span class="n">lang</span><span class="o">.</span><span class="n">split</span><span class="o">.</span><span class="n">first</span> <span class="o">||</span> <span class="s2">&quot;text&quot;</span>
-<a name="line-10"></a>            <span class="n">output</span> <span class="o">=</span> <span class="n">add_code_tags</span><span class="p">(</span>
-<a name="line-11"></a>              <span class="no">Pygments</span><span class="o">.</span><span class="n">highlight</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="ss">:lexer</span> <span class="o">=&gt;</span> <span class="n">lang</span><span class="p">,</span>
-<a name="line-12"></a>                                 <span class="ss">:options</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:encoding</span> <span class="o">=&gt;</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="ss">:lineanchors</span> <span class="o">=&gt;</span><span class="s1">&#39;line&#39;</span> <span class="p">}),</span>
-<a name="line-13"></a>              <span class="n">lang</span>
-<a name="line-14"></a>            <span class="p">)</span>
-<a name="line-15"></a>          <span class="k">end</span>
-<a name="line-16"></a>        <span class="k">end</span>
-<a name="line-17"></a>      <span class="k">end</span>
-<a name="line-18"></a>    <span class="k">end</span>
-<a name="line-19"></a>  <span class="k">end</span>
-<a name="line-20"></a><span class="k">end</span>
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span></span><a id="line-1" name="line-1"></a><span class="k">module</span> <span class="nn">Jekyll</span>
+<a id="line-2" name="line-2"></a>  <span class="k">module</span> <span class="nn">Converters</span>
+<a id="line-3" name="line-3"></a>    <span class="k">class</span> <span class="nc">Markdown</span>
+<a id="line-4" name="line-4"></a>      <span class="k">class</span> <span class="nc">RedcarpetParser</span>
+<a id="line-5" name="line-5"></a>        <span class="k">module</span> <span class="nn">WithPygments</span>
+<a id="line-6" name="line-6"></a>          <span class="kp">include</span> <span class="no">CommonMethods</span>
+<a id="line-7" name="line-7"></a>          <span class="k">def</span> <span class="nf">block_code</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+<a id="line-8" name="line-8"></a>            <span class="nb">require</span> <span class="s1">&#39;pygments&#39;</span>
+<a id="line-9" name="line-9"></a>            <span class="n">lang</span> <span class="o">=</span> <span class="n">lang</span> <span class="o">&amp;&amp;</span> <span class="n">lang</span><span class="o">.</span><span class="n">split</span><span class="o">.</span><span class="n">first</span> <span class="o">||</span> <span class="s2">&quot;text&quot;</span>
+<a id="line-10" name="line-10"></a>            <span class="n">output</span> <span class="o">=</span> <span class="n">add_code_tags</span><span class="p">(</span>
+<a id="line-11" name="line-11"></a>              <span class="no">Pygments</span><span class="o">.</span><span class="n">highlight</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="ss">:lexer</span> <span class="o">=&gt;</span> <span class="n">lang</span><span class="p">,</span>
+<a id="line-12" name="line-12"></a>                                 <span class="ss">:options</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:encoding</span> <span class="o">=&gt;</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="ss">:lineanchors</span> <span class="o">=&gt;</span><span class="s1">&#39;line&#39;</span> <span class="p">}),</span>
+<a id="line-13" name="line-13"></a>              <span class="n">lang</span>
+<a id="line-14" name="line-14"></a>            <span class="p">)</span>
+<a id="line-15" name="line-15"></a>          <span class="k">end</span>
+<a id="line-16" name="line-16"></a>        <span class="k">end</span>
+<a id="line-17" name="line-17"></a>      <span class="k">end</span>
+<a id="line-18" name="line-18"></a>    <span class="k">end</span>
+<a id="line-19" name="line-19"></a>  <span class="k">end</span>
+<a id="line-20" name="line-20"></a><span class="k">end</span>
 </code></pre></div>
 <p>You can add as many <a href="http://pygments.org/docs/formatters/">Pygment options</a> to the <code>:options =&gt; { ... }</code> hash. The above ovverrides the <a href="https://github.com/jekyll/jekyll/blob/master/lib/jekyll/converters/markdown/redcarpet_parser.rb">WithPygments module</a> of the redcarpet parser.</p>
 
 <p>After this your code blocks should look like</p>
-<div class="highlight"><pre><code class="language-css" data-lang="css"><span></span><a name="line-1"></a><span class="p">.</span><span class="nc">left</span> <span class="p">{</span><span class="k">float</span><span class="p">:</span> <span class="kc">left</span><span class="p">;}</span>
-<a name="line-2"></a>
-<a name="line-3"></a><span class="p">.</span><span class="nc">right</span> <span class="p">{</span><span class="k">float</span><span class="p">:</span> <span class="kc">right</span><span class="p">;}</span>
+<div class="highlight"><pre><code class="language-css" data-lang="css"><span></span><a id="line-1" name="line-1"></a><span class="p">.</span><span class="nc">left</span> <span class="p">{</span><span class="k">float</span><span class="p">:</span> <span class="kc">left</span><span class="p">;}</span>
+<a id="line-2" name="line-2"></a>
+<a id="line-3" name="line-3"></a><span class="p">.</span><span class="nc">right</span> <span class="p">{</span><span class="k">float</span><span class="p">:</span> <span class="kc">right</span><span class="p">;}</span>
 </code></pre></div>
 <h2>Line highlighting</h2>
 

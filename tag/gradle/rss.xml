@@ -34,26 +34,26 @@
 <p>Declare your dependencies and versions at the root of the project.</p>
 
 <p><code>$PROJECT_ROOT/dependencies.gradle</code></p>
-<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="n">ext</span><span class="o">.</span><span class="na">versions</span> <span class="o">=</span> <span class="o">[:]</span>
-<a name="line-2"></a>
-<a name="line-3"></a><span class="kt">def</span> <span class="n">versions</span> <span class="o">=</span> <span class="o">[:]</span>
-<a name="line-4"></a>
-<a name="line-5"></a><span class="n">versions</span><span class="o">.</span><span class="na">support_lib</span> <span class="o">=</span> <span class="s1">&#39;26.0.2&#39;</span>
-<a name="line-6"></a><span class="n">versions</span><span class="o">.</span><span class="na">gson</span> <span class="o">=</span> <span class="s1">&#39;2.8.0&#39;</span>
-<a name="line-7"></a>
-<a name="line-8"></a><span class="n">ext</span><span class="o">.</span><span class="na">versions</span> <span class="o">=</span> <span class="n">versions</span>
-<a name="line-9"></a>
-<a name="line-10"></a><span class="n">ext</span><span class="o">.</span><span class="na">deps</span> <span class="o">=</span> <span class="o">[:]</span>
-<a name="line-11"></a><span class="kt">def</span> <span class="n">deps</span> <span class="o">=</span> <span class="o">[:]</span>
-<a name="line-12"></a>
-<a name="line-13"></a><span class="kt">def</span> <span class="n">support_lib</span> <span class="o">=</span> <span class="o">[:]</span>
-<a name="line-14"></a><span class="n">support_lib</span><span class="o">.</span><span class="na">app_compat</span> <span class="o">=</span> <span class="s2">&quot;com.android.support:appcompat-v7:$versions.support_lib&quot;</span>
-<a name="line-15"></a><span class="n">support_lib</span><span class="o">.</span><span class="na">recycler_view</span> <span class="o">=</span> <span class="s2">&quot;com.android.support:recyclerview-v7:$versions.support_lib&quot;</span>
-<a name="line-16"></a><span class="n">deps</span><span class="o">.</span><span class="na">support_lib</span> <span class="o">=</span> <span class="n">support_lib</span>
-<a name="line-17"></a>
-<a name="line-18"></a><span class="n">deps</span><span class="o">.</span><span class="na">gson</span> <span class="o">=</span> <span class="s2">&quot;com.google.code.gson:gson:$versions.gson&quot;</span>
-<a name="line-19"></a>
-<a name="line-20"></a><span class="n">ext</span><span class="o">.</span><span class="na">deps</span> <span class="o">=</span> <span class="n">deps</span>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a id="line-1" name="line-1"></a><span class="n">ext</span><span class="o">.</span><span class="na">versions</span> <span class="o">=</span> <span class="o">[:]</span>
+<a id="line-2" name="line-2"></a>
+<a id="line-3" name="line-3"></a><span class="kt">def</span> <span class="n">versions</span> <span class="o">=</span> <span class="o">[:]</span>
+<a id="line-4" name="line-4"></a>
+<a id="line-5" name="line-5"></a><span class="n">versions</span><span class="o">.</span><span class="na">support_lib</span> <span class="o">=</span> <span class="s1">&#39;26.0.2&#39;</span>
+<a id="line-6" name="line-6"></a><span class="n">versions</span><span class="o">.</span><span class="na">gson</span> <span class="o">=</span> <span class="s1">&#39;2.8.0&#39;</span>
+<a id="line-7" name="line-7"></a>
+<a id="line-8" name="line-8"></a><span class="n">ext</span><span class="o">.</span><span class="na">versions</span> <span class="o">=</span> <span class="n">versions</span>
+<a id="line-9" name="line-9"></a>
+<a id="line-10" name="line-10"></a><span class="n">ext</span><span class="o">.</span><span class="na">deps</span> <span class="o">=</span> <span class="o">[:]</span>
+<a id="line-11" name="line-11"></a><span class="kt">def</span> <span class="n">deps</span> <span class="o">=</span> <span class="o">[:]</span>
+<a id="line-12" name="line-12"></a>
+<a id="line-13" name="line-13"></a><span class="kt">def</span> <span class="n">support_lib</span> <span class="o">=</span> <span class="o">[:]</span>
+<a id="line-14" name="line-14"></a><span class="n">support_lib</span><span class="o">.</span><span class="na">app_compat</span> <span class="o">=</span> <span class="s2">&quot;com.android.support:appcompat-v7:$versions.support_lib&quot;</span>
+<a id="line-15" name="line-15"></a><span class="n">support_lib</span><span class="o">.</span><span class="na">recycler_view</span> <span class="o">=</span> <span class="s2">&quot;com.android.support:recyclerview-v7:$versions.support_lib&quot;</span>
+<a id="line-16" name="line-16"></a><span class="n">deps</span><span class="o">.</span><span class="na">support_lib</span> <span class="o">=</span> <span class="n">support_lib</span>
+<a id="line-17" name="line-17"></a>
+<a id="line-18" name="line-18"></a><span class="n">deps</span><span class="o">.</span><span class="na">gson</span> <span class="o">=</span> <span class="s2">&quot;com.google.code.gson:gson:$versions.gson&quot;</span>
+<a id="line-19" name="line-19"></a>
+<a id="line-20" name="line-20"></a><span class="n">ext</span><span class="o">.</span><span class="na">deps</span> <span class="o">=</span> <span class="n">deps</span>
 </code></pre></div>
 <p>Attaching <code>versions</code> and <code>deps</code> to extra user properties <code>ext</code> will allow you to access those variables all across the project</p>
 
@@ -62,23 +62,23 @@
 <p>Import the definitions at the top of root project&#39;s <code>buildScript</code> block</p>
 
 <p><code>$PROJECT_ROOT/build.gradle</code></p>
-<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="n">buildScript</span> <span class="o">{</span>
-<a name="line-2"></a>  <span class="n">apply</span> <span class="nl">from:</span> <span class="s1">&#39;dependencies.gradle&#39;</span>
-<a name="line-3"></a>
-<a name="line-4"></a>  <span class="c1">//left out for brevity...</span>
-<a name="line-5"></a><span class="o">}</span>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a id="line-1" name="line-1"></a><span class="n">buildScript</span> <span class="o">{</span>
+<a id="line-2" name="line-2"></a>  <span class="n">apply</span> <span class="nl">from:</span> <span class="s1">&#39;dependencies.gradle&#39;</span>
+<a id="line-3" name="line-3"></a>
+<a id="line-4" name="line-4"></a>  <span class="c1">//left out for brevity...</span>
+<a id="line-5" name="line-5"></a><span class="o">}</span>
 </code></pre></div>
 <h4>Final step</h4>
 
 <p>Declare your module dependencies using the variables defined</p>
 
 <p><code>$PROJECT_ROOT/my-module/build.gradle</code></p>
-<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="c1">//left for brevity...</span>
-<a name="line-2"></a><span class="n">dependecies</span> <span class="o">{</span>
-<a name="line-3"></a>  <span class="n">implementation</span> <span class="n">deps</span><span class="o">.</span><span class="na">support_lib</span><span class="o">.</span><span class="na">app_compat</span>
-<a name="line-4"></a>  <span class="n">implementation</span> <span class="n">deps</span><span class="o">.</span><span class="na">support_lib</span><span class="o">.</span><span class="na">recycler_view</span>
-<a name="line-5"></a>  <span class="n">implementation</span> <span class="n">deps</span><span class="o">.</span><span class="na">gson</span>
-<a name="line-6"></a><span class="o">}</span>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a id="line-1" name="line-1"></a><span class="c1">//left for brevity...</span>
+<a id="line-2" name="line-2"></a><span class="n">dependecies</span> <span class="o">{</span>
+<a id="line-3" name="line-3"></a>  <span class="n">implementation</span> <span class="n">deps</span><span class="o">.</span><span class="na">support_lib</span><span class="o">.</span><span class="na">app_compat</span>
+<a id="line-4" name="line-4"></a>  <span class="n">implementation</span> <span class="n">deps</span><span class="o">.</span><span class="na">support_lib</span><span class="o">.</span><span class="na">recycler_view</span>
+<a id="line-5" name="line-5"></a>  <span class="n">implementation</span> <span class="n">deps</span><span class="o">.</span><span class="na">gson</span>
+<a id="line-6" name="line-6"></a><span class="o">}</span>
 </code></pre></div>
 <h2>Approach</h2>
 
@@ -117,16 +117,16 @@
 <h4>The minSdk 21 trick</h4>
 
 <p>It doesn&#39;t matter your app is over the 65K method limit or not, enabling multiDex and having product flavors like this help a lot.  </p>
-<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="n">productFlavors</span> <span class="o">{</span>
-<a name="line-2"></a>    <span class="n">dev</span> <span class="o">{</span>
-<a name="line-3"></a>        <span class="n">multiDexEnabled</span> <span class="kc">true</span>
-<a name="line-4"></a>        <span class="n">minSdkVersion</span> <span class="mi">21</span>
-<a name="line-5"></a>    <span class="o">}</span>
-<a name="line-6"></a>    <span class="n">prod</span> <span class="o">{</span>
-<a name="line-7"></a>        <span class="n">multiDexEnabled</span> <span class="kc">true</span>
-<a name="line-8"></a>        <span class="n">minSdkVersion</span> <span class="mi">15</span>
-<a name="line-9"></a>    <span class="o">}</span>
-<a name="line-10"></a><span class="o">}</span>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a id="line-1" name="line-1"></a><span class="n">productFlavors</span> <span class="o">{</span>
+<a id="line-2" name="line-2"></a>    <span class="n">dev</span> <span class="o">{</span>
+<a id="line-3" name="line-3"></a>        <span class="n">multiDexEnabled</span> <span class="kc">true</span>
+<a id="line-4" name="line-4"></a>        <span class="n">minSdkVersion</span> <span class="mi">21</span>
+<a id="line-5" name="line-5"></a>    <span class="o">}</span>
+<a id="line-6" name="line-6"></a>    <span class="n">prod</span> <span class="o">{</span>
+<a id="line-7" name="line-7"></a>        <span class="n">multiDexEnabled</span> <span class="kc">true</span>
+<a id="line-8" name="line-8"></a>        <span class="n">minSdkVersion</span> <span class="mi">15</span>
+<a id="line-9" name="line-9"></a>    <span class="o">}</span>
+<a id="line-10" name="line-10"></a><span class="o">}</span>
 </code></pre></div>
 <p>And also keep in mind that <strong>Instant Run</strong> has <a href="https://twitter.com/tornorbye/status/717446584284241921">some overhead</a> on the dex method count in your debug builds, which might just make your method count go over the limit.</p>
 
@@ -140,24 +140,24 @@
 <p>Using a daemon essentially means, gradle keeps a JVM and gradle instance running after the first build and reuses the same for subsequent builds. Android Studio <strong>already uses a daemon</strong> for every build that is triggered from the IDE, but this is very useful for builds triggered from the command line.</p>
 
 <p><strong>Dry Run</strong> without daemon</p>
-<div class="highlight"><pre><code class="language-sh" data-lang="sh"><span></span><a name="line-1"></a>./gradlew :app:assembleDebug --dry-run
+<div class="highlight"><pre><code class="language-sh" data-lang="sh"><span></span><a id="line-1" name="line-1"></a>./gradlew :app:assembleDebug --dry-run
 </code></pre></div>
 <p>Output:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a name="line-1"></a>BUILD SUCCESSFUL
-<a name="line-2"></a>
-<a name="line-3"></a>Total time: 11.657 secs
-<a name="line-4"></a>
-<a name="line-5"></a>This build could be faster, please consider using the Gradle Daemon: https://docs.gradle.org/2.10/userguide/gradle_daemon.html
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>BUILD SUCCESSFUL
+<a id="line-2" name="line-2"></a>
+<a id="line-3" name="line-3"></a>Total time: 11.657 secs
+<a id="line-4" name="line-4"></a>
+<a id="line-5" name="line-5"></a>This build could be faster, please consider using the Gradle Daemon: https://docs.gradle.org/2.10/userguide/gradle_daemon.html
 </code></pre></div>
 <h4>Enabling gradle daemon</h4>
 
 <p>In your <code>~/.gradle/gradle.properties</code></p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a name="line-1"></a>org.gradle.daemon=true
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>org.gradle.daemon=true
 </code></pre></div>
 <p><strong>Dry Run output after enabling daemon</strong></p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a name="line-1"></a>BUILD SUCCESSFUL
-<a name="line-2"></a>
-<a name="line-3"></a>Total time: 1.757 secs
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>BUILD SUCCESSFUL
+<a id="line-2" name="line-2"></a>
+<a id="line-3" name="line-3"></a>Total time: 1.757 secs
 </code></pre></div>
 <h4>Upgradle your gradle version</h4>
 
@@ -182,32 +182,32 @@ Edit <code>gradle-wrapper.properties</code> and upgrade gradle <code>distributio
 
 <p>If you have modules that are standalone, you can improve the build time a bit by enabling parallel execution.<br>
 In your <code>./gradle/gradle.properties</code> or <code>&lt;Project Root&gt;/gradle.properties</code>, add this line</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a name="line-1"></a>org.gradle.parallel=true
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>org.gradle.parallel=true
 </code></pre></div>
 <h2>Common Pitfalls</h2>
 
 <h4>Dynamic dependencies</h4>
 
 <p>Use definite version numbers for your dependencies in your gradle</p>
-<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="c1">//Do NOT do this</span>
-<a name="line-2"></a><span class="n">compile</span> <span class="s1">&#39;com.google.code.gson:gson:2.+&#39;</span>
-<a name="line-3"></a>
-<a name="line-4"></a><span class="c1">//Do this instead</span>
-<a name="line-5"></a><span class="n">compile</span> <span class="s1">&#39;com.google.code.gson:gson:2.3&#39;</span>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a id="line-1" name="line-1"></a><span class="c1">//Do NOT do this</span>
+<a id="line-2" name="line-2"></a><span class="n">compile</span> <span class="s1">&#39;com.google.code.gson:gson:2.+&#39;</span>
+<a id="line-3" name="line-3"></a>
+<a id="line-4" name="line-4"></a><span class="c1">//Do this instead</span>
+<a id="line-5" name="line-5"></a><span class="n">compile</span> <span class="s1">&#39;com.google.code.gson:gson:2.3&#39;</span>
 </code></pre></div>
 <p>This avoids the problem of gradle always making a network request to check for the latest version of the dependency</p>
 
 <h4>Avoid heavy computation</h4>
 
 <p>You can find snippets like this on stack overflow that aim to make versioning easier for you</p>
-<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a name="line-1"></a><span class="kt">def</span> <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;git rev-list HEAD --first-parent --count&#39;</span>
-<a name="line-2"></a><span class="kt">def</span> <span class="n">gitVersion</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="na">execute</span><span class="o">().</span><span class="na">text</span><span class="o">.</span><span class="na">trim</span><span class="o">().</span><span class="na">toInteger</span><span class="o">()</span>
-<a name="line-3"></a>
-<a name="line-4"></a><span class="n">android</span> <span class="o">{</span>
-<a name="line-5"></a>  <span class="n">defaultConfig</span> <span class="o">{</span>
-<a name="line-6"></a>    <span class="n">versionCode</span> <span class="n">gitVersion</span>
-<a name="line-7"></a>  <span class="o">}</span>
-<a name="line-8"></a><span class="o">}</span>
+<div class="highlight"><pre><code class="language-groovy" data-lang="groovy"><span></span><a id="line-1" name="line-1"></a><span class="kt">def</span> <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;git rev-list HEAD --first-parent --count&#39;</span>
+<a id="line-2" name="line-2"></a><span class="kt">def</span> <span class="n">gitVersion</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="na">execute</span><span class="o">().</span><span class="na">text</span><span class="o">.</span><span class="na">trim</span><span class="o">().</span><span class="na">toInteger</span><span class="o">()</span>
+<a id="line-3" name="line-3"></a>
+<a id="line-4" name="line-4"></a><span class="n">android</span> <span class="o">{</span>
+<a id="line-5" name="line-5"></a>  <span class="n">defaultConfig</span> <span class="o">{</span>
+<a id="line-6" name="line-6"></a>    <span class="n">versionCode</span> <span class="n">gitVersion</span>
+<a id="line-7" name="line-7"></a>  <span class="o">}</span>
+<a id="line-8" name="line-8"></a><span class="o">}</span>
 </code></pre></div>
 <p>The problem with this code is - gradle needs to count the number of commits for every build. For a large repo which has around <code>20000</code> commits, it takes around <strong>half a second</strong> to just count the number of commits.</p>
 

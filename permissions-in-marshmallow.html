@@ -129,18 +129,18 @@
 <h4>Requesting for permission</h4>
 
 <p>You might have seen a code snippet like below in the training page.</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><a name="line-1"></a><span class="c1">// Here, thisActivity is the current activity</span>
-<a name="line-2"></a><span class="k">if</span> <span class="o">(</span><span class="n">ContextCompat</span><span class="o">.</span><span class="na">checkSelfPermission</span><span class="o">(</span><span class="n">thisActivity</span><span class="o">,</span>
-<a name="line-3"></a>                <span class="n">Manifest</span><span class="o">.</span><span class="na">permission</span><span class="o">.</span><span class="na">READ_CONTACTS</span><span class="o">)</span>
-<a name="line-4"></a>        <span class="o">!=</span> <span class="n">PackageManager</span><span class="o">.</span><span class="na">PERMISSION_GRANTED</span><span class="o">)</span> <span class="o">{</span>
-<a name="line-5"></a>    <span class="c1">// Should we show an explanation?</span>
-<a name="line-6"></a>    <span class="k">if</span> <span class="o">(</span><span class="n">ActivityCompat</span><span class="o">.</span><span class="na">shouldShowRequestPermissionRationale</span><span class="o">(</span><span class="n">thisActivity</span><span class="o">,</span>
-<a name="line-7"></a>            <span class="n">Manifest</span><span class="o">.</span><span class="na">permission</span><span class="o">.</span><span class="na">READ_CONTACTS</span><span class="o">))</span> <span class="o">{</span>
-<a name="line-8"></a>        <span class="c1">//show user the reason for permission</span>
-<a name="line-9"></a>    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-<a name="line-10"></a>        <span class="c1">//request permission</span>
-<a name="line-11"></a>    <span class="o">}</span>
-<a name="line-12"></a><span class="o">}</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><a id="line-1" name="line-1"></a><span class="c1">// Here, thisActivity is the current activity</span>
+<a id="line-2" name="line-2"></a><span class="k">if</span> <span class="p">(</span><span class="n">ContextCompat</span><span class="p">.</span><span class="na">checkSelfPermission</span><span class="p">(</span><span class="n">thisActivity</span><span class="p">,</span>
+<a id="line-3" name="line-3"></a>                <span class="n">Manifest</span><span class="p">.</span><span class="na">permission</span><span class="p">.</span><span class="na">READ_CONTACTS</span><span class="p">)</span>
+<a id="line-4" name="line-4"></a>        <span class="o">!=</span> <span class="n">PackageManager</span><span class="p">.</span><span class="na">PERMISSION_GRANTED</span><span class="p">)</span> <span class="p">{</span>
+<a id="line-5" name="line-5"></a>    <span class="c1">// Should we show an explanation?</span>
+<a id="line-6" name="line-6"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">ActivityCompat</span><span class="p">.</span><span class="na">shouldShowRequestPermissionRationale</span><span class="p">(</span><span class="n">thisActivity</span><span class="p">,</span>
+<a id="line-7" name="line-7"></a>            <span class="n">Manifest</span><span class="p">.</span><span class="na">permission</span><span class="p">.</span><span class="na">READ_CONTACTS</span><span class="p">))</span> <span class="p">{</span>
+<a id="line-8" name="line-8"></a>        <span class="c1">//show user the reason for permission</span>
+<a id="line-9" name="line-9"></a>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<a id="line-10" name="line-10"></a>        <span class="c1">//request permission</span>
+<a id="line-11" name="line-11"></a>    <span class="p">}</span>
+<a id="line-12" name="line-12"></a><span class="p">}</span>
 </code></pre></div>
 <h3>Pay Attention</h3>
 
@@ -176,52 +176,52 @@
 <h3>The way out</h3>
 
 <p>Check for <code>shouldShowRequestPermissionRationale()</code> before and after asking permission. If it returns false both the times then the user chose &#39;Don&#39;t ask again&#39; in the past or the device policy doesn&#39;t allow for that permission.</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span>  <span class="kt">boolean</span> <span class="n">before</span><span class="o">,</span> <span class="n">after</span><span class="o">;</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span>  <span class="kt">boolean</span> <span class="n">before</span><span class="p">,</span> <span class="n">after</span><span class="p">;</span>
 
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">requestContactsPermission</span><span class="o">()</span> <span class="o">{</span>
-      <span class="k">if</span> <span class="o">(</span><span class="n">ContextCompat</span><span class="o">.</span><span class="na">checkSelfPermission</span><span class="o">(</span><span class="n">thisActivity</span><span class="o">,</span>
-                      <span class="n">Manifest</span><span class="o">.</span><span class="na">permission</span><span class="o">.</span><span class="na">READ_CONTACTS</span><span class="o">)</span>
-              <span class="o">!=</span> <span class="n">PackageManager</span><span class="o">.</span><span class="na">PERMISSION_GRANTED</span><span class="o">)</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">requestContactsPermission</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">ContextCompat</span><span class="p">.</span><span class="na">checkSelfPermission</span><span class="p">(</span><span class="n">thisActivity</span><span class="p">,</span>
+                      <span class="n">Manifest</span><span class="p">.</span><span class="na">permission</span><span class="p">.</span><span class="na">READ_CONTACTS</span><span class="p">)</span>
+              <span class="o">!=</span> <span class="n">PackageManager</span><span class="p">.</span><span class="na">PERMISSION_GRANTED</span><span class="p">)</span> <span class="p">{</span>
           <span class="c1">// Should we show an explanation?</span>
-<span class="hll">          <span class="n">before</span> <span class="o">=</span> <span class="n">ActivityCompat</span><span class="o">.</span><span class="na">shouldShowRequestPermissionRationale</span><span class="o">(</span><span class="n">thisActivity</span><span class="o">,</span>
-</span><span class="hll">                  <span class="n">Manifest</span><span class="o">.</span><span class="na">permission</span><span class="o">.</span><span class="na">READ_CONTACTS</span><span class="o">);</span>
-</span><span class="hll">          <span class="k">if</span> <span class="o">(</span><span class="n">before</span><span class="o">)</span> <span class="o">{</span>
+<span class="hll">          <span class="n">before</span> <span class="o">=</span> <span class="n">ActivityCompat</span><span class="p">.</span><span class="na">shouldShowRequestPermissionRationale</span><span class="p">(</span><span class="n">thisActivity</span><span class="p">,</span>
+</span><span class="hll">                  <span class="n">Manifest</span><span class="p">.</span><span class="na">permission</span><span class="p">.</span><span class="na">READ_CONTACTS</span><span class="p">);</span>
+</span><span class="hll">          <span class="k">if</span> <span class="p">(</span><span class="n">before</span><span class="p">)</span> <span class="p">{</span>
 </span>              <span class="c1">//show user the reason for permission</span>
-          <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+          <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
               <span class="c1">//request permission</span>
-          <span class="o">}</span>
-      <span class="o">}</span>
-  <span class="o">}</span>
+          <span class="p">}</span>
+      <span class="p">}</span>
+  <span class="p">}</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onRequestPermissionsResult</span><span class="o">(</span><span class="kt">int</span> <span class="n">requestCode</span><span class="o">,</span>
-          <span class="n">String</span> <span class="n">permissions</span><span class="o">[],</span> <span class="kt">int</span><span class="o">[]</span> <span class="n">grantResults</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">switch</span> <span class="o">(</span><span class="n">requestCode</span><span class="o">)</span> <span class="o">{</span>
-          <span class="k">case</span> <span class="n">MY_PERMISSIONS_REQUEST_READ_CONTACTS</span><span class="o">:</span> <span class="o">{</span>
-              <span class="k">if</span> <span class="o">(</span><span class="n">grantResults</span><span class="o">.</span><span class="na">length</span> <span class="o">&gt;</span> <span class="mi">0</span>
-                  <span class="o">&amp;&amp;</span> <span class="n">grantResults</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">==</span> <span class="n">PackageManager</span><span class="o">.</span><span class="na">PERMISSION_GRANTED</span><span class="o">)</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onRequestPermissionsResult</span><span class="p">(</span><span class="kt">int</span> <span class="n">requestCode</span><span class="p">,</span>
+          <span class="n">String</span> <span class="n">permissions</span><span class="o">[]</span><span class="p">,</span> <span class="kt">int</span><span class="o">[]</span> <span class="n">grantResults</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">switch</span> <span class="p">(</span><span class="n">requestCode</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">case</span> <span class="n">MY_PERMISSIONS_REQUEST_READ_CONTACTS</span><span class="p">:</span> <span class="p">{</span>
+              <span class="k">if</span> <span class="p">(</span><span class="n">grantResults</span><span class="p">.</span><span class="na">length</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                  <span class="o">&amp;&amp;</span> <span class="n">grantResults</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">==</span> <span class="n">PackageManager</span><span class="p">.</span><span class="na">PERMISSION_GRANTED</span><span class="p">)</span> <span class="p">{</span>
                   <span class="c1">// permission was granted, yay! Do the</span>
                   <span class="c1">// contacts-related task you need to do.</span>
-              <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-<span class="hll">                  <span class="n">after</span> <span class="o">=</span> <span class="n">ActivityCompat</span><span class="o">.</span><span class="na">shouldShowRequestPermissionRationale</span><span class="o">(</span>
-</span><span class="hll">                  <span class="n">thisActivity</span><span class="o">,</span>
-</span><span class="hll">                  <span class="n">Manifest</span><span class="o">.</span><span class="na">permission</span><span class="o">.</span><span class="na">READ_CONTACTS</span><span class="o">);</span>
-</span><span class="hll">                  <span class="kt">boolean</span> <span class="n">goToSettings</span> <span class="o">=</span> <span class="o">!(</span><span class="n">after</span> <span class="o">||</span> <span class="n">before</span><span class="o">);</span>
-</span><span class="hll">                  <span class="n">showRationale</span><span class="o">(</span><span class="n">goToSettings</span><span class="o">);</span>
-</span>              <span class="o">}</span>
-              <span class="k">return</span><span class="o">;</span>
-          <span class="o">}</span>
-      <span class="o">}</span>
-  <span class="o">}</span>
+              <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="hll">                  <span class="n">after</span> <span class="o">=</span> <span class="n">ActivityCompat</span><span class="p">.</span><span class="na">shouldShowRequestPermissionRationale</span><span class="p">(</span>
+</span><span class="hll">                  <span class="n">thisActivity</span><span class="p">,</span>
+</span><span class="hll">                  <span class="n">Manifest</span><span class="p">.</span><span class="na">permission</span><span class="p">.</span><span class="na">READ_CONTACTS</span><span class="p">);</span>
+</span><span class="hll">                  <span class="kt">boolean</span> <span class="n">goToSettings</span> <span class="o">=</span> <span class="o">!</span><span class="p">(</span><span class="n">after</span> <span class="o">||</span> <span class="n">before</span><span class="p">);</span>
+</span><span class="hll">                  <span class="n">showRationale</span><span class="p">(</span><span class="n">goToSettings</span><span class="p">);</span>
+</span>              <span class="p">}</span>
+              <span class="k">return</span><span class="p">;</span>
+          <span class="p">}</span>
+      <span class="p">}</span>
+  <span class="p">}</span>
 </code></pre></div>
 <p>If both <code>before</code> and <code>after</code> are <code>false</code>, then show the user a dialog explaining that we need the contacts permission with a &#39;GO TO SETTINGS&#39; button. On click take him to your application in the settings like this :</p>
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><a name="line-1"></a><span class="kd">private</span> <span class="kt">void</span> <span class="nf">goToSettings</span><span class="o">()</span> <span class="o">{</span>
-<a name="line-2"></a>    <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Intent</span><span class="o">();</span>
-<a name="line-3"></a>    <span class="n">intent</span><span class="o">.</span><span class="na">setAction</span><span class="o">(</span><span class="n">Settings</span><span class="o">.</span><span class="na">ACTION_APPLICATION_DETAILS_SETTINGS</span><span class="o">);</span>
-<a name="line-4"></a>    <span class="n">Uri</span> <span class="n">uri</span> <span class="o">=</span> <span class="n">Uri</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">&quot;package:&quot;</span> <span class="o">+</span> <span class="n">getPackageName</span><span class="o">());</span>
-<a name="line-5"></a>    <span class="n">intent</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="n">uri</span><span class="o">);</span>
-<a name="line-6"></a>    <span class="n">startActivity</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
-<a name="line-7"></a><span class="o">}</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span></span><a id="line-1" name="line-1"></a><span class="kd">private</span> <span class="kt">void</span> <span class="nf">goToSettings</span><span class="p">()</span> <span class="p">{</span>
+<a id="line-2" name="line-2"></a>    <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Intent</span><span class="p">();</span>
+<a id="line-3" name="line-3"></a>    <span class="n">intent</span><span class="p">.</span><span class="na">setAction</span><span class="p">(</span><span class="n">Settings</span><span class="p">.</span><span class="na">ACTION_APPLICATION_DETAILS_SETTINGS</span><span class="p">);</span>
+<a id="line-4" name="line-4"></a>    <span class="n">Uri</span> <span class="n">uri</span> <span class="o">=</span> <span class="n">Uri</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;package:&quot;</span> <span class="o">+</span> <span class="n">getPackageName</span><span class="p">());</span>
+<a id="line-5" name="line-5"></a>    <span class="n">intent</span><span class="p">.</span><span class="na">setData</span><span class="p">(</span><span class="n">uri</span><span class="p">);</span>
+<a id="line-6" name="line-6"></a>    <span class="n">startActivity</span><span class="p">(</span><span class="n">intent</span><span class="p">);</span>
+<a id="line-7" name="line-7"></a><span class="p">}</span>
 </code></pre></div>
 
         </section>
@@ -321,7 +321,7 @@ s.setAttribute('data-timestamp', +new Date());
 
 
         <footer class="site-footer clearfix">
-          <section class="copyright"><a href="/">Blog | Manideep</a> &copy; 2017</section>
+          <section class="copyright"><a href="/">Blog | Manideep</a> &copy; 2022</section>
           <section class="poweredby">Published with <a href="http://jekyllrb.com/">Jekyll</a></section>
         </footer>
     </div>
