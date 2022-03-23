@@ -5,3 +5,4 @@
 .jekyll-metadata
 .asset-cache
 _site
+.jekyll-cache
