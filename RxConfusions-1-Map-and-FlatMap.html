@@ -7,7 +7,7 @@
 
     <!-- [[! Page Meta ]] -->
     <title>RxConfusions - Part 1 : Map and FlatMap</title>
-    <meta name="description" content="Blog | Manideep - Android · Development · Design" />
+    <meta name="description" content="@okmanideep - Android · Development · Design" />
 
     <meta name="HandheldFriendly" content="True" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="/assets/favicon-47a0420670a0a244defce9e5220a1f403f170a7a9015f99ca753a4fe2369c98f.ico" >
 
     <!-- [[! Styles'n'Scripts ]] -->
-    <link type="text/css" rel="stylesheet" href="/assets/main-0828c4b1405facf91509860d41beff1e13c12aa9b8bfd727103702240986e982.css">
+    <link type="text/css" rel="stylesheet" href="/assets/main-a530f04c4b5ccd9b01681ae981b87b1048c46dcf06e89702b5d199ffdd1937fe.css">
     <link href='https://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'>
 
     <!-- [[! Ghost outputs important style and meta data with this tag ]] -->
@@ -23,7 +23,7 @@
     <meta name="referrer" content="origin" />
     <link rel="next" href="page2/" />
 
-    <meta property="og:site_name" content="Blog | Manideep" />
+    <meta property="og:site_name" content="@okmanideep" />
     <meta property="og:type" content="article" />
     <meta property="og:title" content="RxConfusions - Part 1 : Map and FlatMap" />
     <meta property="og:description" content="You probably know what the map operator is. This post discussed mostly about FlatMap and that probably will remove the confusion between map and flatMap operators if any" />
@@ -35,7 +35,7 @@
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="RxConfusions - Part 1 : Map and FlatMap" />
     <meta name="twitter:description" content="You probably know what the map operator is. This post discussed mostly about FlatMap and that probably will remove the confusion between map and flatMap operators if any" />
-    <meta name="twitter:image" content="https://okmanideep.github.io/assets/logo_black_square-e3783420100f3db97c5f11badb0484f43bbfc54487fda2a0bb7791d2e68252e9.png" />
+    <meta name="twitter:image" content="https://okmanideep.github.io/assets/logo-black-square-f3037481c9f695233b2f4855e0d33fdc674d2b2a8fd8245ed5485d76208a257b.png" />
     <meta name="twitter:author" content="@okmanideep">
 
     <script type="application/ld+json">
@@ -44,13 +44,13 @@
     "@type": "Website",
     "publisher": "Manideep Polireddi",
     "url": "https://okmanideep.github.io",
-    "image": "/assets/logo_black-e492ce6d683ab7ad291843c9ca39fe242daa139336311d97ef7a497205882578.png",
+    "image": "/assets/logo-black-2e47e992b06507b3775750a2b8b939d6e1eecd27a8a1991865497c7e901ff8b5.png",
     "description": "Android · Development · Design"
 }
     </script>
 
     <meta name="generator" content="Jekyll 3.0.0" />
-    <link rel="alternate" type="application/rss+xml" title="Blog | Manideep" href="feed.xml" />
+    <link rel="alternate" type="application/rss+xml" title="@okmanideep" href="feed.xml" />
 
 
 </head>
@@ -87,10 +87,10 @@
 
 <header class="main-header post-head no-cover">
     <nav class="main-nav  clearfix">
-        <a class="blog-logo" href="/"><img src="/assets/logo_black-e492ce6d683ab7ad291843c9ca39fe242daa139336311d97ef7a497205882578.png" alt="Blog Logo"></a>
-        
-            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
-        
+        <a class="blog-logo" href="/"><img src="/assets/logo-white-75ce62a26171e897ee54c33128a1c7e591909134ef170d6c866e9ea84501473c.png" alt="Blog Logo"></a>
+        <a class="subscribe-logo" href="feed.xml">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M25.57 176.1C12.41 175.4 .9117 185.2 .0523 198.4s9.173 24.65 22.39 25.5c120.1 7.875 225.7 112.7 233.6 233.6C256.9 470.3 267.4 480 279.1 480c.5313 0 1.062-.0313 1.594-.0625c13.22-.8438 23.25-12.28 22.39-25.5C294.6 310.3 169.7 185.4 25.57 176.1zM32 32C14.33 32 0 46.31 0 64s14.33 32 32 32c194.1 0 352 157.9 352 352c0 17.69 14.33 32 32 32s32-14.31 32-32C448 218.6 261.4 32 32 32zM63.1 351.9C28.63 351.9 0 380.6 0 416s28.63 64 63.1 64s64.08-28.62 64.08-64S99.37 351.9 63.1 351.9z"/></svg>
+        </a>
     </nav>
 </header>
 
@@ -116,13 +116,10 @@
                        
                 
                 
-                 · 
-                <span class="post-author">by <a rel="author" href="/author/okmanideep">Manideep Polireddi</a>
             </section>
         </header>
 
         <section class="post-content">
-            
             <p>If you don&#39;t know what RxJava is or you aren&#39;t comfortable with the terms <code>Observable</code>, <code>Observer</code>, <code>Operator</code> and <code>Subscriber</code>, I suggest you have a look at <a href="http://blog.danlew.net/2014/09/15/grokking-rxjava-part-1/">Grokking RxJava</a> series by <a href="https://twitter.com/danlew42">Dan Lew</a>. </p>
 
 <p>If you have surfed through some RxJava content on the web, you should have come accross the <code>map()</code> operator. It is exactly what you think it is. But you might have seen people using the <code>flatMap()</code> operator in similar senarios which might have confused you a bit. Let&#39;s use them both in a small example and observe the effects of these operators.</p>
@@ -248,79 +245,9 @@ It calls <code>onComplete()</code> only when all the observables are <em>complet
 </code></pre></div>
 <p>By using this method, you don&#39;t need to worry about calling the right functions to the subscriber. Thanks to <a href="https://www.reddit.com/r/androiddev/comments/3u5w0c/if_you_are_writing_observablecreate_theres_a_big/">pakoito</a> for pointing that out.</p>
 
-
         </section>
 
-        <footer class="post-footer">
-
-            <!-- Everything inside the #author tags pulls data from the author -->
-            <!-- #author-->
-
-            
-            <figure class="author-image">
-                <a class="img" href="/author/okmanideep" style="background-image: url(/assets/okmanideep-34d7c885397d7187bfe366f2bba160dc2b3d389d196afe2d95a236ec6a751196.jpg)"><span class="hidden">'s Picture</span></a>
-            </figure>
-            
-
-            <section class="author">
-                <h4><a href="/author/okmanideep" rel="author">Manideep Polireddi</a></h4>
-                
-                
-                    <p> Android developer · Design Enthusiast</p>
-                
-                <div class="author-meta">
-                    <span class="author-location icon-location"> Mumbai, India</span> 
-                    <!-- <span class="author-link icon-link"><a href="https://okmanideep.github.io"> okmanideep.github.io/</a></span> -->
-                <span class="author-twitter icon-twitter"><a href="https://twitter.com/okmanideep">@okmanideep</a></span>
-                </div>
-            </section>
-
-            <!-- /author  -->
-
-            <section class="share">
-                <h4>Share this post</h4>
-                <a class="icon-twitter" href="http://twitter.com/share?text=RxConfusions - Part 1 : Map and FlatMap&amp;url=https://okmanideep.github.io/RxConfusions-1-Map-and-FlatMap"
-                    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
-                    <span class="hidden">Twitter</span>
-                </a>
-                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://okmanideep.github.io/RxConfusions-1-Map-and-FlatMap"
-                    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
-                    <span class="hidden">Facebook</span>
-                </a>
-                <a class="icon-google-plus" href="https://plus.google.com/share?url=https://okmanideep.github.io/RxConfusions-1-Map-and-FlatMap"
-                   onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
-                    <span class="hidden">Google+</span>
-                </a>
-            </section>
-            
-            <!-- Add Disqus Comments -->
-            
-                <div id="disqus_thread"></div>
-<script>
-/**
-* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
-*/
-var disqus_config = function () {
-    this.page.url = "https://okmanideep.github.io/RxConfusions-1-Map-and-FlatMap"; // Replace PAGE_URL with your page's canonical URL variable
-    this.page.identifier = 20151201201000; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-this.page.title = "RxConfusions - Part 1 : Map and FlatMap"
-};
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-
-s.src = 'https://manidesto.disqus.com/embed.js';
-
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
-
-            
-            
-        </footer>
-
+        <hr />
     </article>
 
 </main>
@@ -332,7 +259,7 @@ s.setAttribute('data-timestamp', +new Date());
         <a class="read-next-story no-cover" href="/improve-android-build-times">
             <section class="post">
                 <h2>Improve your Android build times</h2>
-                <p>If you have the time to watch the video, go ahead. [Madis Pink](https://twitter.com/madisp) goes over...</p>
+                <time class="post-date" datetime="2016-04-05">06 Apr 2016</time>
             </section>
         </a>
     
@@ -342,7 +269,7 @@ s.setAttribute('data-timestamp', +new Date());
         <a class="read-next-story prev no-cover" href="/clean-way-to-define-support-library-dependencies">
             <section class="post">
                 <h2>Clean way to define support library dependencies</h2>
-                <p><p>As the support library started getting bigger with more tools in it, the team at...</p>
+                <time class="post-date" datetime="2015-11-23">24 Nov 2015</time>
             </section>
         </a>
     
@@ -353,16 +280,10 @@ s.setAttribute('data-timestamp', +new Date());
 
 
         <footer class="site-footer clearfix">
-          <section class="copyright"><a href="/">Blog | Manideep</a> &copy; 2022</section>
+          <section class="copyright"><a href="/">@okmanideep</a> &copy; 2022</section>
           <section class="poweredby">Published with <a href="http://jekyllrb.com/">Jekyll</a></section>
         </footer>
     </div>
-    <!-- [[! Ghost outputs important scripts and data with this tag ]] -->
-    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <!-- [[! The main JavaScript file for Casper ]] -->
-    <script type="text/javascript" src="/assets/jquery.fitvids-901b9c743bac51c8ab996478f988ecc2afada3cfaf4f2253f3975fc5331205d8.js"></script>
-    <script type="text/javascript" src="/assets/index-7a2b9d29160eb0b7584fe9ac12c02eb3312106734d3f54924e417522c6f4b705.js"></script>
-
     <!-- Add Google Analytics  -->
         <!-- Google Analytics Tracking code -->
      <script>
