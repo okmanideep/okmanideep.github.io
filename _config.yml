@@ -17,9 +17,9 @@ timezone: 'Asia/Kolkata'
 baseurl: ''
 
 # Website info
-name: 'Blog | Manideep'
+name: '@okmanideep'
 description: "Android · Development · Design"
-logo: 'logo_black_square.png'
+logo: 'logo-black-square.png'
 fblogo: 'logo_fb.jpg'
 
 # Author's info

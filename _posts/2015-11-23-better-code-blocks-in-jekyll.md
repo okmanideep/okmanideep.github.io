@@ -10,7 +10,7 @@ subclass: 'post tag-jekyll tag-gh-pages'
 categories: 'okmanideep'
 navigation: True
 disqus: 20151123201000
-logo: 'logo_black.png'
+logo: 'logo-white.png'
 ---
 
 If you are blogging a lot of code, it makes a huge difference if you style your code blocks well. If you are using some Jekyll theme, chances are the default output is not so pleasing. If you are not much familiar with `Jekyll` or `Pygments`, trust me it would take a lot of time to get what you want by just searching the web. I have gathered  all the scattered suggestions I found and arranged them into this post. Let's make your code look better

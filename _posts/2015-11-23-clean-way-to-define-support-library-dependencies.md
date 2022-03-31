@@ -10,7 +10,7 @@ subclass: 'post tag-android'
 categories: 'okmanideep'
 navigation: True
 disqus: 20151124201000
-logo: 'logo_black.png'
+logo: 'logo-white.png'
 ---
 
 As the support library started getting bigger with more tools in it, the team at google have suggested developers to pick and choose the individual pieces of the library in their dependencies. More recently our `build.gradle` files started to look like this

@@ -2,6 +2,7 @@
 layout: default
 class: 'post-template'
 disqus: false
+logo: 'logo-white.png'
 ---
 <!-- < default -->
 
@@ -13,10 +14,10 @@ disqus: false
 
 <header class="main-header post-head {% if page.cover %}" style="background-image: url({{ site.baseurl }}{{ page.cover | asset_path }}) {% else %}no-cover{% endif %}">
     <nav class="main-nav {% if page.cover %} overlay {% endif %} clearfix">
-        {% if page.logo %}<a class="blog-logo" href="{{ site.baseurl }}/">{% img "{{page.logo}}" alt:'Blog Logo' %}</a>{% endif %}
-        {% if page.navigation %}
-            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
-        {% endif %}
+        <a class="blog-logo" href="{{ site.baseurl }}/">{% img "{{page.logo | default: 'logo-white.png'}}" alt:'Blog Logo' %}</a>
+        <a class="subscribe-logo" href="{{ site.baseurl }}feed.xml">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M25.57 176.1C12.41 175.4 .9117 185.2 .0523 198.4s9.173 24.65 22.39 25.5c120.1 7.875 225.7 112.7 233.6 233.6C256.9 470.3 267.4 480 279.1 480c.5313 0 1.062-.0313 1.594-.0625c13.22-.8438 23.25-12.28 22.39-25.5C294.6 310.3 169.7 185.4 25.57 176.1zM32 32C14.33 32 0 46.31 0 64s14.33 32 32 32c194.1 0 352 157.9 352 352c0 17.69 14.33 32 32 32s32-14.31 32-32C448 218.6 261.4 32 32 32zM63.1 351.9C28.63 351.9 0 380.6 0 416s28.63 64 63.1 64s64.08-28.62 64.08-64S99.37 351.9 63.1 351.9z"/></svg>
+        </a>
     </nav>
 </header>
 
@@ -40,68 +41,14 @@ disqus: false
                     {% endif %}   
                 {% endfor %}
                 {% endif %}
-                 · 
-                <span class="post-author">by <a rel="author" href="{{ site.baseurl }}/author/{{ site.username }}">{{ site.author }}</a>
             </section>
         </header>
 
         <section class="post-content">
-            
             {{ content }}
-
         </section>
 
-        <footer class="post-footer">
-
-            <!-- Everything inside the #author tags pulls data from the author -->
-            <!-- #author-->
-
-            {% if site.image %}
-            <figure class="author-image">
-                <a class="img" href="{{ site.baseurl }}/author/{{ site.username }}" style="background-image: url({{ site.baseurl }}{{ site.image | asset_path }})"><span class="hidden">{{ page.author }}'s Picture</span></a>
-            </figure>
-            {% endif %}
-
-            <section class="author">
-                <h4><a href="{{ site.baseurl }}/author/{{ site.username }}" rel="author">{{ site.author }}</a></h4>
-                
-                {% if site.bio %}
-                    <p> {{ site.bio }}</p>
-                {% else %}
-                    <p>Read <a href="{{ site.baseurl }}/author/{{ site.username }}">more posts</a> by this author.</p>
-                {% endif %}
-                <div class="author-meta">
-                    {% if site.location %}<span class="author-location icon-location"> {{ site.location }}</span>{% endif %} 
-                    <!-- {% if site.url %}<span class="author-link icon-link"><a href="{{ site.url }}"> {{ site.short_url }}</a></span>{% endif %} -->
-                {% if site.twitter %}<span class="author-twitter icon-twitter"><a href="https://twitter.com/{{ site.twitter }}">@{{ site.twitter }}</a></span>{% endif %}
-                </div>
-            </section>
-
-            <!-- /author  -->
-
-            <section class="share">
-                <h4>Share this post</h4>
-                <a class="icon-twitter" href="http://twitter.com/share?text={{ page.title }}&amp;url={{ site.url }}{{ page.url }}"
-                    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
-                    <span class="hidden">Twitter</span>
-                </a>
-                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ site.url }}{{ page.url }}"
-                    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
-                    <span class="hidden">Facebook</span>
-                </a>
-                <a class="icon-google-plus" href="https://plus.google.com/share?url={{ site.url }}{{ page.url }}"
-                   onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
-                    <span class="hidden">Google+</span>
-                </a>
-            </section>
-            
-            <!-- Add Disqus Comments -->
-            {% if page.disqus %}
-                {% include disqus.html %}
-            {% endif %}
-            
-        </footer>
-
+        <hr />
     </article>
 
 </main>
@@ -113,7 +60,7 @@ disqus: false
         <a class="read-next-story {% if page.next.cover %}" style="background-image: url({{ site.baseurl }}{{ page.next.cover }}){% else %}no-cover{% endif %}" href="{{ site.baseurl }}{{ page.next.url }}">
             <section class="post">
                 <h2>{{ page.next.title }}</h2>
-                <p>{{ page.next.content | truncatewords:15 }}</p>
+                <time class="post-date" datetime="{{ page.next.date | date:'%Y-%m-%d' }}">{{ page.next.date | date_to_string }}</time>
             </section>
         </a>
     {% endif %}
@@ -123,7 +70,7 @@ disqus: false
         <a class="read-next-story prev {% if page.previous.cover %}" style="background-image: url({{ site.baseurl }}{{ page.previous.cover }}){% else %}no-cover{% endif %}" href="{{ site.baseurl }}{{ page.previous.url }}">
             <section class="post">
                 <h2>{{ page.previous.title }}</h2>
-                <p>{{ page.previous.content | truncatewords:15 }}</p>
+                <time class="post-date" datetime="{{ page.previous.date | date:'%Y-%m-%d' }}">{{ page.previous.date | date_to_string }}</time>
             </section>
         </a>
     {% endif %}
