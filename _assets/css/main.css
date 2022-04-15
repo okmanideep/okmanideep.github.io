@@ -113,6 +113,8 @@ table { border-collapse: collapse; border-spacing: 0; }
   --highlight-text-color-hover: #78bbf1;
   --highlight-border-color: #218EE8;
   --raised-bg-color: #282c34;
+
+  --max-content-width: 940px;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:ital@0;1&family=Rubik:ital,wght@0,600;1,600&display=swap');
@@ -145,7 +147,6 @@ body {
 
 @media only screen and (min-device-width: 960px) {
     .content {
-        width: 880px;
         font-size: 1.2rem;
     }
 }
@@ -271,7 +272,6 @@ pre {
     font-family: 'JetBrains Mono', monospace;
     padding: 0.6em;
     white-space: pre;
-    overflow-x: scroll;
     word-break: normal;
     word-wrap: normal;
     margin-bottom: 1em;
@@ -279,6 +279,8 @@ pre {
     background-color: var(--raised-bg-color);
     border-radius: 3px;
     font-size: 0.9em;
+    overflow-x: scroll;
+    scrollbar-color: var(--raised-bg-color) var(--main-bg-color);
 }
 
 pre code, pre tt, pre a {
@@ -387,7 +389,7 @@ margin on the iframe, cause it breaks stuff. */
 .inner {
     position: relative;
     width: 80%;
-    max-width: 710px;
+    max-width: var(--max-content-width);
     margin: 0 auto;
 }
 
@@ -606,7 +608,7 @@ a.subscribe-logo:hover svg {
 .post {
     position: relative;
     width: 80%;
-    max-width: 710px;
+    max-width: var(--max-content-width);
     margin: 2em auto;
     word-wrap: break-word;
 }
@@ -912,7 +914,7 @@ a.subscribe-logo:hover svg {
 .pagination {
     position: relative;
     width: 80%;
-    max-width: 710px;
+    max-width: var(--max-content-width);
     margin: 4em auto;
     color: var(--dim-text-color);
     text-align: center;
