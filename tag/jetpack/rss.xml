@@ -487,9 +487,9 @@
 <li><code>DisposableEffect</code> of the <i>incoming composable</i>* runs after the <i>outgoing composable</i>* disposes (<code>onDispose</code>)</li>
 </ul>
 
-<p>💫 When animated, the outgoing composable is disposed only after the animation is complete</p>
+<p>💫 When animated, the outgoing composable is disposed only after the animation is complete. Hence the incoming composable's <code>DisposableEffect</code>s run before the the outgoing composable disposes.</p>
 
-<p>🚫 Composition and Effects are skipped when the inputs don't change, according to <code>equals()</code></p>
+<p>🚫 Composition and Effects are skipped when the inputs don't change. Inputs are compared using their <code>equals()</code> method</p>
 </div>
 
 	  ]]></description>
