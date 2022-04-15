@@ -20,7 +20,14 @@
             <h2 class="post-title"><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h2>
         </header>
         <section class="post-excerpt">
-            <p>{{ post.content | truncatewords: 26 }} <a class="read-more" href="{{ site.baseurl }}{{ post.url }}">&raquo;</a></p>
+            <p>
+                {% if post.description %}
+                    {{ post.description }} 
+                {% else %}
+                    {{ post.content | truncatewords: 26 }} 
+                {% endif %}
+                <a class="read-more" href="{{ site.baseurl }}{{ post.url }}">&raquo;</a>
+            </p>
         </section>
         <footer class="post-meta">
             {% if post.tags.size > 0 %} 
