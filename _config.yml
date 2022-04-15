@@ -19,8 +19,8 @@ baseurl: ''
 # Website info
 name: '@okmanideep'
 description: "Android · Development · Design"
-logo: 'logo-black-square.png'
-fblogo: 'logo_fb.jpg'
+logo: 'logo-black-on-white-square.jpg'
+fblogo: 'logo-black-on-white-square.jpg'
 
 # Author's info
 author: 'Manideep Polireddi'
