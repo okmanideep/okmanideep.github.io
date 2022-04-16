@@ -1,7 +1,7 @@
 ---
 layout: post
 cover: false
-title: 'Understanding Composition and Side Effects'
+title: '[Draft] Understanding Composition and Side Effects'
 description: 'Important aspect to any framework that relies on functions is to understand when they are invoked. Read along to get a crystal clear understanding'
 date:   2022-04-01 18:00:00
 tags: jetpack compose android
@@ -132,33 +132,9 @@ So these are the logs
 <p>When a <code>Composable</code> is removed from the UI:</p>
 
 <ul>
-<li>All the <code>onDispose</code>s run in <strong>reverse order</strong> as present in the code</li>
+<li>All the <code>onDispose</code>s run in <strong>reverse order</strong> of their corresponding <code>DisposableEffect</code>s</li>
 </ul>
 </div>
-
-### 💡 Tip!
-Arrange your code to reflect the order of execution. Keep all the effects at the end of the function in the order of `DisposableEffect`, `SideEffect` and `LaunchedEffect`. It helps discover some code smells by making them slightly more apparent.
-
-```kotlin
-@Composable
-fun MyComponent(/*...*/) {
-    // Describe the UI
-
-    DisposableEffect(/*...*/) {
-        // acquire resource / attach
-
-        onDispose {
-            // release resource / detach
-        }
-    }
-    SideEffect {
-        // ...
-    }
-    LaunchedEffect(/*...*/) {
-        // ...
-    }
-}
-```
 
 ---
 
