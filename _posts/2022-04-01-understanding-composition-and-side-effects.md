@@ -24,53 +24,61 @@ categories: 'okmanideep'
 }
 </style>
 
-With compose, we write a lot of functions and lambdas in our code. It is essential to know the order of execution of these functions, if and when are they executed.
+Jetpack Compose is a **Declarative UI Framework** that allows us to define UI, state and side effects by declaring functions. A lot of them. Named and anonymous (lambdas). We will try and understand when does the framework invoke the functions we are declaring.
+
+Some of those functions we *declare* are [Side Effects](https://developer.android.com/jetpack/compose/side-effects). Specifically we are going to look at `LaunchedEffect`, `SideEffect` and `DisposableEffect`
+
+They look like this in the code
+
+```kotlin
+LaunchedEffect(/*key(s)*/) {
+    /* effect that we are declaring as a lambda */
+}
+```
+
+When the above code is run, `LaunchedEffect` [the function](https://developer.android.com/reference/kotlin/androidx/compose/runtime/package-summary#LaunchedEffect(kotlin.Any,kotlin.coroutines.SuspendFunction1)) runs and registers the lambda we passed, to run it when it needs to be run. Well when exactly? We should get an idea very soon. 
 
 Let's dive in. 
 
-We are going to use the following `Composable` to find out the order of execution and understand in what order our code executes during runtime.
-
 ## 🛠 Setup
+A `@Composable` which sets up a bunch of logs inside Side Effects - `DisposableEffect`, `SideEffect` and `LaunchedEffect`
+
 ```kotlin
 @Composable
-private fun TrafficLight(
-    lightEmoji: String,
-    modifier: Modifier = Modifier
+fun Effects(
+    logTag: String,
+    key: Any = logTag,
 ) {
-    log("$lightEmoji Composition 1")
-    LaunchedEffect(lightEmoji) {
-        log("$lightEmoji LaunchedEffect 1")
+    val tag = logTag.padEnd(25)
+    log("$tag - Registering Effects")
+    LaunchedEffect(key) {
+        log("$tag - LaunchedEffect")
     }
-    SideEffect {
-        log("$lightEmoji SideEffect 1")
-    }
-    DisposableEffect(lightEmoji) {
-        log("$lightEmoji DisposableEffect 1")
-
+    DisposableEffect(key) {
+        log("$tag - DisposableEffect")
         onDispose {
-            log("$lightEmoji onDispose 1")
+            log("$tag - onDispose")
         }
     }
-
-    Text(lightEmoji, fontSize = 120.sp, modifier = modifier)
-
-    log("$lightEmoji Composition 2")
-    LaunchedEffect(lightEmoji) {
-        log("$lightEmoji LaunchedEffect 2")
-    }
     SideEffect {
-        log("$lightEmoji SideEffect 2")
-    }
-    DisposableEffect(lightEmoji) {
-        log("$lightEmoji DisposableEffect 2")
-
-        onDispose {
-            log("$lightEmoji onDispose 2")
-        }
+        log("$tag - SideEffect")
     }
 }
 ```
-Just a bunch of logs around a `Text`
+
+And a `TrafficLight` that shows an emoji in `Text`. Also uses the `Effects` we defined above for logging
+
+```kotlin
+@Composable
+fun TrafficLight(
+    lightEmoji: String,
+    modifier: Modifier = Modifier
+) {
+    Text(lightEmoji, fontSize = 120.sp, modifier = modifier)
+
+    Effects("TrafficLight($lightEmoji)")
+}
+```
 
 ## Touch And Go
 We are going to start by adding and removing this `TrafficLight` on touch as shown below
@@ -104,36 +112,85 @@ So these are the logs
 
 ```
 ---Click---------------------
-🟢 Composition - 1
-🟢 Composition - 2
-🟢 DisposableEffect - 1
-🟢 DisposableEffect - 2
-🟢 SideEffect - 1
-🟢 SideEffect - 2
-🟢 LaunchedEffect - 1
-🟢 LaunchedEffect - 2
+TrafficLight(🟢)     - Registering Effects
+TrafficLight(🟢)     - DisposableEffect
+TrafficLight(🟢)     - SideEffect
+TrafficLight(🟢)     - LaunchedEffect
 ---Click---------------------
-🟢 onDispose - 2
-🟢 onDispose - 1
+TrafficLight(🟢)     - onDispose
 ```
 
 <div class="insight">
 <h3>✨ Insights</h3>
 
-<p>When a <code>Composable</code> is added to the UI:</p>
+<p>When a <code>Composable</code> enters composition:</p>
 
 <ul>
-<li>Composition (our <code>@Composable</code> function) runs first</li>
-<li>Then all the <code>DisposableEffect</code>s in the order present in the code</li>
-<li>Then all the <code>SideEffect</code>s in the order present in the code</li>
-<li>and then all the <code>LaunchedEffect</code>s in the order present in the code</li>
+<li>Our <code>@Composable</code> function runs first</li>
+<li>Then the <code>DisposableEffect</code>, the <code>SideEffect</code> and the <code>LaunchedEffect</code> in that order</li>
 </ul>
 
-<p>When a <code>Composable</code> is removed from the UI:</p>
+<p>When a <code>Composable</code> exits composition:</p>
 
 <ul>
-<li>All the <code>onDispose</code>s run in <strong>reverse order</strong> of their corresponding <code>DisposableEffect</code>s</li>
+<li>The <code>onDispose</code> of the corresponding <code>DisposableEffect</code> runs</li>
 </ul>
+</div>
+
+Let's make it slightly more interesting. Let's add `Effects` above and below the `TrafficLight`
+
+```kotlin{8,10}
+@Composable
+fun TouchAndGo() {
+    var isVisible by remember { mutableStateOf(false) }
+    Box(
+        /*...*/
+    ) {
+        if (isVisible) {
+            Effects("Pre - TrafficLight(🟢)")
+            TrafficLight(lightEmoji = "🟢")
+            Effects("Post - TrafficLight(🟢)")
+        }
+    }
+}
+```
+
+So what do we have on the logs now?
+
+```
+---Click---------------------
+Pre - TrafficLight(🟢)    - Registering Effects
+TrafficLight(🟢)          - Registering Effects
+Post - TrafficLight(🟢)   - Registering Effects
+Pre - TrafficLight(🟢)    - DisposableEffect
+TrafficLight(🟢)          - DisposableEffect
+Post - TrafficLight(🟢)   - DisposableEffect
+Pre - TrafficLight(🟢)    - SideEffect
+TrafficLight(🟢)          - SideEffect
+Post - TrafficLight(🟢)   - SideEffect
+Pre - TrafficLight(🟢)    - LaunchedEffect
+TrafficLight(🟢)          - LaunchedEffect
+Post - TrafficLight(🟢)   - LaunchedEffect
+---Click---------------------
+Post - TrafficLight(🟢)   - onDispose
+TrafficLight(🟢)          - onDispose
+Pre - TrafficLight(🟢)    - onDispose
+```
+
+<div class="insight">
+<h3>✨ Insights</h3>
+
+<p>On Entering Composition: </p>
+<ul>
+    <li>All the Side Effects run in the order they are declared / registered</li>
+    <li>Among the different Side Effects - <code>DisposableEffect</code>s run first, followed by <code>SideEffect</code>s, followed by <code>LaunchedEffect</code></li>
+</ul>
+
+<p>On Exiting Composition: </p>
+<ul>
+    <li><code>DisposableEffect</code>s are <i>disposed</i> in the <b>reverse</b> order they are declared / registered. <b>L</b>ast <b>I</b>n <b>F</b>irst <b>O</b>ut - LIFO. Like a stack!</li>
+</ul>
+
 </div>
 
 ---
@@ -166,33 +223,31 @@ fun StopAndGo() {
   <source src="https://i.imgur.com/pJWzmgh.mp4" type="video/mp4">
 </video>
 
-Let's look at the logs. For brevity, we removed multiple logs for Composition and Effects
-
 ```
-🟢 Composition
-🟢 DisposableEffect
-🟢 SideEffect
-🟢 LaunchedEffect
+TrafficLight(🟢)     - Registering Effects
+TrafficLight(🟢)     - DisposableEffect
+TrafficLight(🟢)     - SideEffect
+TrafficLight(🟢)     - LaunchedEffect
 ---Click---------------------
-🔴 Composition
-🟢 onDispose
-🔴 DisposableEffect
-🔴 SideEffect
-🔴 LaunchedEffect
+TrafficLight(🔴)     - Registering Effects
+TrafficLight(🟢)     - onDispose
+TrafficLight(🔴)     - DisposableEffect
+TrafficLight(🔴)     - SideEffect
+TrafficLight(🔴)     - LaunchedEffect
 ```
-One might have expected this, but it is an important aspect to keep in mind.
 
 <div class="insight">
 <h3>✨ Insights</h3>
 <ul>
-<li>Composition of the <i>incoming composable</i>* runs before the <i>outgoing composable</i>* disposes (<code>onDispose</code>)</li>
-<li><code>DisposableEffect</code> of the <i>incoming composable</i>* runs after the <i>outgoing composable</i>* disposes (<code>onDispose</code>)</li>
+<li>Incoming <code>DisposableEffect</code>s are <b>registered before</b> the outgoing <code>DisposableEffect</code>s are <b>disposed</b></li>
+<li>Incoming <code>DisposableEffect</code>s are <b>run after</b> the outgoing <code>DisposableEffect</code>s are <b>disposed</b></li>
 </ul>
 
 </div>
 
+One might have expected this, because compose runtime figures out what are *incoming* and what are *outgoing* only after it runs / re-runs our `Composable` functions based on the new `State`.
 
-> *There is no notion of incoming and outgoing composable _objects_ at runtime in the above example. I have chosen to word it that way since we are accustomed to object oriented thinking. Essentially at runtime, compose notices a `State` change, re-runs the corresponding code that is accessing the state. The re-run is what informs the runtime of which `DisposableEffect`s to dispose. We will come back to this notion of objects at runtime later
+Nevertheless, this is an important aspect to keep in mind. Since this makes it safe for two `Composable`s that are never in composition together, to `acquire`/`release` to the same resource in their `DisposableEffect`s.
 
 ## Stop Fade Go
 More often than not, we animate our changes. Let's look at the order of execution when we add animation to the above example
@@ -220,25 +275,25 @@ fun StopFadeGo() {
 ```
 
 ```
-🟢 Composition
-🟢 DisposableEffect
-🟢 SideEffect
-🟢 LaunchedEffect
+TrafficLight(🟢)     - Registering Effects
+TrafficLight(🟢)     - DisposableEffect
+TrafficLight(🟢)     - SideEffect
+TrafficLight(🟢)     - LaunchedEffect
 ---Click---------------------
-🔴 Composition
-🔴 DisposableEffect
-🔴 SideEffect
-🔴 LaunchedEffect
-🟢 onDispose
+TrafficLight(🔴)     - Registering Effects
+TrafficLight(🔴)     - DisposableEffect
+TrafficLight(🔴)     - SideEffect
+TrafficLight(🔴)     - LaunchedEffect
+TrafficLight(🟢)     - onDispose
 ```
 
 <div class="insight">
 <h3>✨ Insights</h3>
 
-<p>When animated, the outgoing composable is disposed only after the animation is complete</p>
+<p>When animated, the outgoing <code>DisposableEffect</code>s are disposed only after the animation is complete</p>
 </div>
 
-Might feel obvious in hindsight. But it is important to keep in mind that since the `DisposableEffect` of the incoming composable runs before the `onDispose` of the outgoing composable, if they are trying to attach to the same instance or acquire the same resource, it might create issues.
+Might feel obvious in hindsight. But it is important to keep in mind that since the *incoming* `DisposableEffect` runs before the *outgoing* disposes. This basically doesn't allow those `Composable`s to acquire/attach-to the same resource.
 
 ---
 ## Ready Set Go
@@ -280,18 +335,20 @@ fun ReadySetGo() {
 </video>
 
 ```
-🔴 Composition
-🔴 DisposableEffect
-🔴 SideEffect
-🔴 LaunchedEffect
+TrafficLight(🔴)     - Registering Effects
+TrafficLight(🔴)     - DisposableEffect
+TrafficLight(🔴)     - SideEffect
+TrafficLight(🔴)     - LaunchedEffect
 ---Click---------------------
 ---Click---------------------
-🟢 Composition
-🔴 onDispose
-🟢 DisposableEffect
-🟢 SideEffect
-🟢 LaunchedEffect
+TrafficLight(🟢)     - Registering Effects
+TrafficLight(🔴)     - onDispose
+TrafficLight(🟢)     - DisposableEffect
+TrafficLight(🟢)     - SideEffect
+TrafficLight(🟢)     - LaunchedEffect
 ```
+
+> Note that for both "Ready" and "Set" states, the light is 🔴
 
 <div class="insight">
 <h3>✨ Insights</h3>
@@ -308,7 +365,7 @@ private class Light(val emoji: String)
 ```
 Update the `TrafficLight` and `ReadySetGo` to use `Light` instead of a `String`
 
-```kotlin{15,23,32,40,50}
+```kotlin{15,23,32,35,38}
 @Composable
 fun ReadySetGoClass() {
     var count by remember { mutableStateOf(1) }
@@ -344,52 +401,38 @@ private fun TrafficLight(
     modifier: Modifier = Modifier
 ) {
     val lightEmoji = light.emoji
-    log("$lightEmoji Composition")
-
     Text(lightEmoji, fontSize = 120.sp, modifier = modifier)
 
-    DisposableEffect(light) {
-        log("$lightEmoji DisposableEffect")
-
-        onDispose {
-            log("$lightEmoji onDispose")
-        }
-    }
-    SideEffect {
-        log("$lightEmoji SideEffect")
-    }
-    LaunchedEffect(light) {
-        log("$lightEmoji LaunchedEffect")
-    }
+    Effects("TrafficLight($lightEmoji)", key = light)
 }
 ```
 
 Here are the logs after the change
 
 ```
-🔴 Composition
-🔴 DisposableEffect
-🔴 SideEffect
-🔴 LaunchedEffect
+TrafficLight(🔴)     - Registering Effects
+TrafficLight(🔴)     - DisposableEffect
+TrafficLight(🔴)     - SideEffect
+TrafficLight(🔴)     - LaunchedEffect
 ---Click---------------------
-🔴 Composition
-🔴 onDispose
-🔴 DisposableEffect
-🔴 SideEffect
-🔴 LaunchedEffect
+TrafficLight(🔴)     - Registering Effects
+TrafficLight(🔴)     - onDispose
+TrafficLight(🔴)     - DisposableEffect
+TrafficLight(🔴)     - SideEffect
+TrafficLight(🔴)     - LaunchedEffect
 ---Click---------------------
-🟢 Composition
-🔴 onDispose
-🟢 DisposableEffect
-🟢 SideEffect
-🟢 LaunchedEffect
+TrafficLight(🟢)     - Registering Effects
+TrafficLight(🔴)     - onDispose
+TrafficLight(🟢)     - DisposableEffect
+TrafficLight(🟢)     - SideEffect
+TrafficLight(🟢)     - LaunchedEffect
 ```
 
 Well what happened there!
 
-Our `Light` doesn't implement `.equals()`, the default implementation returns true only if they are the same instances. But we are creating a new instance every time. So compose runtime sees these as different inputs.
+Our `Light` doesn't implement `.equals()`. The default implementation returns true only if they are the same instances. But we are creating a new instance every time. So compose runtime sees these as different inputs.
 
-Let's add a log to equals
+Let's add a log to `equals()`
 
 ```kotlin{4-5}
 private class Light(val emoji: String) {
@@ -408,31 +451,33 @@ Haven't changed the implementation yet. Just added a log.
 The same logs as above but with `equals()`
 
 ```
-🔴 Composition
-🔴 DisposableEffect
-🔴 SideEffect
-🔴 LaunchedEffect
+TrafficLight(🔴)     - Registering Effects
+TrafficLight(🔴)     - DisposableEffect
+TrafficLight(🔴)     - SideEffect
+TrafficLight(🔴)     - LaunchedEffect
 ---Click---------------------
 🔴.equals(🔴) = false
-🔴 Composition
+TrafficLight(🔴)     - Registering Effects
 🔴.equals(🔴) = false
 🔴.equals(🔴) = false
-🔴 onDispose
-🔴 DisposableEffect
-🔴 SideEffect
-🔴 LaunchedEffect
+TrafficLight(🔴)     - onDispose
+TrafficLight(🔴)     - DisposableEffect
+TrafficLight(🔴)     - SideEffect
+TrafficLight(🔴)     - LaunchedEffect
 ---Click---------------------
 🔴.equals(🟢) = false
-🟢 Composition
+TrafficLight(🟢)     - Registering Effects
 🔴.equals(🟢) = false
 🔴.equals(🟢) = false
-🔴 onDispose
-🟢 DisposableEffect
-🟢 SideEffect
-🟢 LaunchedEffect
+TrafficLight(🔴)     - onDispose
+TrafficLight(🟢)     - DisposableEffect
+TrafficLight(🟢)     - SideEffect
+TrafficLight(🟢)     - LaunchedEffect
 ```
 
 So compose runtime compared the inputs. It observed that they are different (`.equals()` returned `false`), so ran the composable with the new input. It then compared the inputs again, to see if it has to run the `DisposableEffect` and the `LaunchedEffect` and ran them again because it received `false`.
+
+> After all `DisposableEffect` and `LaunchedEffect` are `Composable` functions themselves
 
 Let's implement `equals()`
 
@@ -450,21 +495,21 @@ private class Light(val emoji: String) {
 ```
 
 ```
-🔴 Composition
-🔴 DisposableEffect
-🔴 SideEffect
-🔴 LaunchedEffect
+TrafficLight(🔴)     - Registering Effects
+TrafficLight(🔴)     - DisposableEffect
+TrafficLight(🔴)     - SideEffect
+TrafficLight(🔴)     - LaunchedEffect
 ---Click---------------------
 🔴.equals(🔴) = true
 ---Click---------------------
 🔴.equals(🟢) = false
-🟢 Composition
+TrafficLight(🟢)     - Registering Effects
 🔴.equals(🟢) = false
 🔴.equals(🟢) = false
-🔴 onDispose
-🟢 DisposableEffect
-🟢 SideEffect
-🟢 LaunchedEffect
+TrafficLight(🔴)     - onDispose
+TrafficLight(🟢)     - DisposableEffect
+TrafficLight(🟢)     - SideEffect
+TrafficLight(🟢)     - LaunchedEffect
 ```
 Back to normal.
 
@@ -472,28 +517,25 @@ Let's summarize all the insights
 
 <div class="insight">
 <h3>✨ Insights</h3>
-<p>🟩 When a <code>Composable</code> is added to the UI:</p>
-
+<p>➡️ On Entering Composition: </p>
 <ul>
-<li>Composition (our <code>@Composable</code> function) runs first</li>
-<li>Then all the <code>DisposableEffect</code>s in the order present in the code</li>
-<li>Then all the <code>SideEffect</code>s in the order present in the code</li>
-<li>and then all the <code>LaunchedEffect</code>s in the order present in the code</li>
+    <li>Our `Composable` function runs first</li>
+    <li>All the Side Effects run in the order they are declared / registered</li>
+    <li>Among the different Side Effects - <code>DisposableEffect</code>s run first, followed by <code>SideEffect</code>s, followed by <code>LaunchedEffect</code></li>
 </ul>
 
-<p>🗑️  When a <code>Composable</code> is removed from the UI:</p>
-
+<p>⬅️ On Exiting Composition: </p>
 <ul>
-<li>All the <code>onDispose</code>s run in <strong>reverse order</strong> as present in the code</li>
+    <li><code>DisposableEffect</code>s are <i>disposed</i> in the <b>reverse</b> order they are declared / registered. <b>L</b>ast <b>I</b>n <b>F</b>irst <b>O</b>ut - LIFO. Like a stack!</li>
 </ul>
 
 <p>🔀 When a composable is being replaced with another or recomposed with the new state:</p>
 <ul>
-<li>Composition of the <i>incoming composable</i>* runs before the <i>outgoing composable</i>* disposes (<code>onDispose</code>)</li>
-<li><code>DisposableEffect</code> of the <i>incoming composable</i>* runs after the <i>outgoing composable</i>* disposes (<code>onDispose</code>)</li>
+<li>Incoming <code>DisposableEffect</code>s are <b>registered before</b> the outgoing <code>DisposableEffect</code>s are <b>disposed</b></li>
+<li>Incoming <code>DisposableEffect</code>s are <b>run after</b> the outgoing <code>DisposableEffect</code>s are <b>disposed</b></li>
 </ul>
 
-<p>💫 When animated, the outgoing composable is disposed only after the animation is complete. Hence the incoming composable's <code>DisposableEffect</code>s run before the the outgoing composable disposes.</p>
+<p>💫 When animated, the outgoing <code>DisposableEffect</code>s are disposed only after the animation is complete.</p>
 
 <p>🚫 Composition and Effects are skipped when the inputs don't change. Inputs are compared using their <code>equals()</code> method</p>
 </div>

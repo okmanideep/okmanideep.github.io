@@ -284,6 +284,7 @@ pre {
 }
 
 pre code, pre tt, pre a {
+    font-family: 'JetBrains Mono', monospace;
     display: inline-block;
     line-height: 1.2em;
     font-size: 1.0em;
