@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.0">Jekyll</generator><link href="https://okmanideep.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://okmanideep.github.io/" rel="alternate" type="text/html" /><updated>2022-04-16T16:41:05+05:30</updated><id>https://okmanideep.github.io/feed.xml</id><title type="html">@okmanideep</title><subtitle>Android · Development · Design</subtitle><author><name>Manideep Polireddi</name></author><entry><title type="html">[Draft] Understanding Composition and Side Effects</title><link href="https://okmanideep.github.io/understanding-composition-and-side-effects" rel="alternate" type="text/html" title="[Draft] Understanding Composition and Side Effects" /><published>2022-04-01T23:30:00+05:30</published><updated>2022-04-01T23:30:00+05:30</updated><id>https://okmanideep.github.io/understanding-composition-and-side-effects</id><content type="html" xml:base="https://okmanideep.github.io/understanding-composition-and-side-effects"><![CDATA[<style>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.0">Jekyll</generator><link href="https://okmanideep.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://okmanideep.github.io/" rel="alternate" type="text/html" /><updated>2022-04-16T16:46:43+05:30</updated><id>https://okmanideep.github.io/feed.xml</id><title type="html">@okmanideep</title><subtitle>Android · Development · Design</subtitle><author><name>Manideep Polireddi</name></author><entry><title type="html">[Draft] Understanding Composition and Side Effects</title><link href="https://okmanideep.github.io/understanding-composition-and-side-effects" rel="alternate" type="text/html" title="[Draft] Understanding Composition and Side Effects" /><published>2022-04-01T23:30:00+05:30</published><updated>2022-04-01T23:30:00+05:30</updated><id>https://okmanideep.github.io/understanding-composition-and-side-effects</id><content type="html" xml:base="https://okmanideep.github.io/understanding-composition-and-side-effects"><![CDATA[<style>
 .insight {
     background: #3B4354;
     border-radius: 3px;
@@ -460,7 +460,7 @@
 <h3>✨ Insights</h3>
 <p>➡️ On Entering Composition: </p>
 <ul>
-    <li>Our `Composable` function runs first</li>
+    <li>Our <code>Composable</code> function runs first</li>
     <li>All the Side Effects run in the order they are declared / registered</li>
     <li>Among the different Side Effects - <code>DisposableEffect</code>s run first, followed by <code>SideEffect</code>s, followed by <code>LaunchedEffect</code></li>
 </ul>
