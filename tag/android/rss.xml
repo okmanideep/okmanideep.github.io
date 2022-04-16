@@ -12,7 +12,7 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
-	  <title>[Draft] Understanding Composition and Side Effects</title>
+	  <title>Understanding Composition and Side Effects</title>
 	  <link>/understanding-composition-and-side-effects</link>
 	  <author>Manideep Polireddi</author>
 	  <pubDate>2022-04-01T23:30:00+05:30</pubDate>
