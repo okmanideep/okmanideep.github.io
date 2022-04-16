@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.0">Jekyll</generator><link href="https://okmanideep.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://okmanideep.github.io/" rel="alternate" type="text/html" /><updated>2022-04-16T14:00:16+05:30</updated><id>https://okmanideep.github.io/feed.xml</id><title type="html">@okmanideep</title><subtitle>Android · Development · Design</subtitle><author><name>Manideep Polireddi</name></author><entry><title type="html">[Draft] Understanding Composition and Side Effects</title><link href="https://okmanideep.github.io/understanding-composition-and-side-effects" rel="alternate" type="text/html" title="[Draft] Understanding Composition and Side Effects" /><published>2022-04-01T23:30:00+05:30</published><updated>2022-04-01T23:30:00+05:30</updated><id>https://okmanideep.github.io/understanding-composition-and-side-effects</id><content type="html" xml:base="https://okmanideep.github.io/understanding-composition-and-side-effects"><![CDATA[<style>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.0">Jekyll</generator><link href="https://okmanideep.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://okmanideep.github.io/" rel="alternate" type="text/html" /><updated>2022-04-16T16:41:05+05:30</updated><id>https://okmanideep.github.io/feed.xml</id><title type="html">@okmanideep</title><subtitle>Android · Development · Design</subtitle><author><name>Manideep Polireddi</name></author><entry><title type="html">[Draft] Understanding Composition and Side Effects</title><link href="https://okmanideep.github.io/understanding-composition-and-side-effects" rel="alternate" type="text/html" title="[Draft] Understanding Composition and Side Effects" /><published>2022-04-01T23:30:00+05:30</published><updated>2022-04-01T23:30:00+05:30</updated><id>https://okmanideep.github.io/understanding-composition-and-side-effects</id><content type="html" xml:base="https://okmanideep.github.io/understanding-composition-and-side-effects"><![CDATA[<style>
 .insight {
     background: #3B4354;
     border-radius: 3px;
@@ -12,53 +12,54 @@
 }
 </style>
 
-<p>With compose, we write a lot of functions and lambdas in our code. It is essential to know the order of execution of these functions, if and when are they executed.</p>
+<p>Jetpack Compose is a <strong>Declarative UI Framework</strong> that allows us to define UI, state and side effects by declaring functions. A lot of them. Named and anonymous (lambdas). We will try and understand when does the framework invoke the functions we are declaring.</p>
+
+<p>Some of those functions we <em>declare</em> are <a href="https://developer.android.com/jetpack/compose/side-effects">Side Effects</a>. Specifically we are going to look at <code>LaunchedEffect</code>, <code>SideEffect</code> and <code>DisposableEffect</code></p>
+
+<p>They look like this in the code</p>
+<div class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span></span><a id="line-1" name="line-1"></a><span class="n">LaunchedEffect</span><span class="p">(</span><span class="cm">/*key(s)*/</span><span class="p">)</span> <span class="p">{</span>
+<a id="line-2" name="line-2"></a>    <span class="cm">/* effect that we are declaring as a lambda */</span>
+<a id="line-3" name="line-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>When the above code is run, <code>LaunchedEffect</code> <a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/package-summary#LaunchedEffect(kotlin.Any,kotlin.coroutines.SuspendFunction1)">the function</a> runs and registers the lambda we passed, to run it when it needs to be run. Well when exactly? We should get an idea very soon. </p>
 
 <p>Let&#39;s dive in. </p>
 
-<p>We are going to use the following <code>Composable</code> to find out the order of execution and understand in what order our code executes during runtime.</p>
-
 <h2>🛠 Setup</h2>
+
+<p>A <code>@Composable</code> which sets up a bunch of logs inside Side Effects - <code>DisposableEffect</code>, <code>SideEffect</code> and <code>LaunchedEffect</code></p>
 <div class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span></span><a id="line-1" name="line-1"></a><span class="nd">@Composable</span>
-<a id="line-2" name="line-2"></a><span class="kd">private</span> <span class="kd">fun</span> <span class="nf">TrafficLight</span><span class="p">(</span>
+<a id="line-2" name="line-2"></a><span class="kd">fun</span> <span class="nf">Effects</span><span class="p">(</span>
+<a id="line-3" name="line-3"></a>    <span class="n">logTag</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
+<a id="line-4" name="line-4"></a>    <span class="n">key</span><span class="p">:</span> <span class="kt">Any</span> <span class="o">=</span> <span class="n">logTag</span><span class="p">,</span>
+<a id="line-5" name="line-5"></a><span class="p">)</span> <span class="p">{</span>
+<a id="line-6" name="line-6"></a>    <span class="kd">val</span> <span class="nv">tag</span> <span class="o">=</span> <span class="n">logTag</span><span class="p">.</span><span class="na">padEnd</span><span class="p">(</span><span class="m">25</span><span class="p">)</span>
+<a id="line-7" name="line-7"></a>    <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">tag</span><span class="s"> - Registering Effects&quot;</span><span class="p">)</span>
+<a id="line-8" name="line-8"></a>    <span class="n">LaunchedEffect</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="p">{</span>
+<a id="line-9" name="line-9"></a>        <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">tag</span><span class="s"> - LaunchedEffect&quot;</span><span class="p">)</span>
+<a id="line-10" name="line-10"></a>    <span class="p">}</span>
+<a id="line-11" name="line-11"></a>    <span class="n">DisposableEffect</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="p">{</span>
+<a id="line-12" name="line-12"></a>        <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">tag</span><span class="s"> - DisposableEffect&quot;</span><span class="p">)</span>
+<a id="line-13" name="line-13"></a>        <span class="n">onDispose</span> <span class="p">{</span>
+<a id="line-14" name="line-14"></a>            <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">tag</span><span class="s"> - onDispose&quot;</span><span class="p">)</span>
+<a id="line-15" name="line-15"></a>        <span class="p">}</span>
+<a id="line-16" name="line-16"></a>    <span class="p">}</span>
+<a id="line-17" name="line-17"></a>    <span class="n">SideEffect</span> <span class="p">{</span>
+<a id="line-18" name="line-18"></a>        <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">tag</span><span class="s"> - SideEffect&quot;</span><span class="p">)</span>
+<a id="line-19" name="line-19"></a>    <span class="p">}</span>
+<a id="line-20" name="line-20"></a><span class="p">}</span>
+</code></pre></div>
+<p>And a <code>TrafficLight</code> that shows an emoji in <code>Text</code>. Also uses the <code>Effects</code> we defined above for logging</p>
+<div class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span></span><a id="line-1" name="line-1"></a><span class="nd">@Composable</span>
+<a id="line-2" name="line-2"></a><span class="kd">fun</span> <span class="nf">TrafficLight</span><span class="p">(</span>
 <a id="line-3" name="line-3"></a>    <span class="n">lightEmoji</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
 <a id="line-4" name="line-4"></a>    <span class="n">modifier</span><span class="p">:</span> <span class="n">Modifier</span> <span class="o">=</span> <span class="n">Modifier</span>
 <a id="line-5" name="line-5"></a><span class="p">)</span> <span class="p">{</span>
-<a id="line-6" name="line-6"></a>    <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s"> Composition 1&quot;</span><span class="p">)</span>
-<a id="line-7" name="line-7"></a>    <span class="n">LaunchedEffect</span><span class="p">(</span><span class="n">lightEmoji</span><span class="p">)</span> <span class="p">{</span>
-<a id="line-8" name="line-8"></a>        <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s"> LaunchedEffect 1&quot;</span><span class="p">)</span>
-<a id="line-9" name="line-9"></a>    <span class="p">}</span>
-<a id="line-10" name="line-10"></a>    <span class="n">SideEffect</span> <span class="p">{</span>
-<a id="line-11" name="line-11"></a>        <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s"> SideEffect 1&quot;</span><span class="p">)</span>
-<a id="line-12" name="line-12"></a>    <span class="p">}</span>
-<a id="line-13" name="line-13"></a>    <span class="n">DisposableEffect</span><span class="p">(</span><span class="n">lightEmoji</span><span class="p">)</span> <span class="p">{</span>
-<a id="line-14" name="line-14"></a>        <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s"> DisposableEffect 1&quot;</span><span class="p">)</span>
-<a id="line-15" name="line-15"></a>
-<a id="line-16" name="line-16"></a>        <span class="n">onDispose</span> <span class="p">{</span>
-<a id="line-17" name="line-17"></a>            <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s"> onDispose 1&quot;</span><span class="p">)</span>
-<a id="line-18" name="line-18"></a>        <span class="p">}</span>
-<a id="line-19" name="line-19"></a>    <span class="p">}</span>
-<a id="line-20" name="line-20"></a>
-<a id="line-21" name="line-21"></a>    <span class="n">Text</span><span class="p">(</span><span class="n">lightEmoji</span><span class="p">,</span> <span class="n">fontSize</span> <span class="o">=</span> <span class="m">120.</span><span class="n">sp</span><span class="p">,</span> <span class="n">modifier</span> <span class="o">=</span> <span class="n">modifier</span><span class="p">)</span>
-<a id="line-22" name="line-22"></a>
-<a id="line-23" name="line-23"></a>    <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s"> Composition 2&quot;</span><span class="p">)</span>
-<a id="line-24" name="line-24"></a>    <span class="n">LaunchedEffect</span><span class="p">(</span><span class="n">lightEmoji</span><span class="p">)</span> <span class="p">{</span>
-<a id="line-25" name="line-25"></a>        <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s"> LaunchedEffect 2&quot;</span><span class="p">)</span>
-<a id="line-26" name="line-26"></a>    <span class="p">}</span>
-<a id="line-27" name="line-27"></a>    <span class="n">SideEffect</span> <span class="p">{</span>
-<a id="line-28" name="line-28"></a>        <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s"> SideEffect 2&quot;</span><span class="p">)</span>
-<a id="line-29" name="line-29"></a>    <span class="p">}</span>
-<a id="line-30" name="line-30"></a>    <span class="n">DisposableEffect</span><span class="p">(</span><span class="n">lightEmoji</span><span class="p">)</span> <span class="p">{</span>
-<a id="line-31" name="line-31"></a>        <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s"> DisposableEffect 2&quot;</span><span class="p">)</span>
-<a id="line-32" name="line-32"></a>
-<a id="line-33" name="line-33"></a>        <span class="n">onDispose</span> <span class="p">{</span>
-<a id="line-34" name="line-34"></a>            <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s"> onDispose 2&quot;</span><span class="p">)</span>
-<a id="line-35" name="line-35"></a>        <span class="p">}</span>
-<a id="line-36" name="line-36"></a>    <span class="p">}</span>
-<a id="line-37" name="line-37"></a><span class="p">}</span>
+<a id="line-6" name="line-6"></a>    <span class="n">Text</span><span class="p">(</span><span class="n">lightEmoji</span><span class="p">,</span> <span class="n">fontSize</span> <span class="o">=</span> <span class="m">120.</span><span class="n">sp</span><span class="p">,</span> <span class="n">modifier</span> <span class="o">=</span> <span class="n">modifier</span><span class="p">)</span>
+<a id="line-7" name="line-7"></a>
+<a id="line-8" name="line-8"></a>    <span class="n">Effects</span><span class="p">(</span><span class="s">&quot;TrafficLight(</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s">)&quot;</span><span class="p">)</span>
+<a id="line-9" name="line-9"></a><span class="p">}</span>
 </code></pre></div>
-<p>Just a bunch of logs around a <code>Text</code></p>
-
 <h2>Touch And Go</h2>
 
 <p>We are going to start by adding and removing this <code>TrafficLight</code> on touch as shown below</p>
@@ -88,35 +89,78 @@
 
 <p>So these are the logs</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>---Click---------------------
-<a id="line-2" name="line-2"></a>🟢 Composition - 1
-<a id="line-3" name="line-3"></a>🟢 Composition - 2
-<a id="line-4" name="line-4"></a>🟢 DisposableEffect - 1
-<a id="line-5" name="line-5"></a>🟢 DisposableEffect - 2
-<a id="line-6" name="line-6"></a>🟢 SideEffect - 1
-<a id="line-7" name="line-7"></a>🟢 SideEffect - 2
-<a id="line-8" name="line-8"></a>🟢 LaunchedEffect - 1
-<a id="line-9" name="line-9"></a>🟢 LaunchedEffect - 2
-<a id="line-10" name="line-10"></a>---Click---------------------
-<a id="line-11" name="line-11"></a>🟢 onDispose - 2
-<a id="line-12" name="line-12"></a>🟢 onDispose - 1
+<a id="line-2" name="line-2"></a>TrafficLight(🟢)     - Registering Effects
+<a id="line-3" name="line-3"></a>TrafficLight(🟢)     - DisposableEffect
+<a id="line-4" name="line-4"></a>TrafficLight(🟢)     - SideEffect
+<a id="line-5" name="line-5"></a>TrafficLight(🟢)     - LaunchedEffect
+<a id="line-6" name="line-6"></a>---Click---------------------
+<a id="line-7" name="line-7"></a>TrafficLight(🟢)     - onDispose
 </code></pre></div>
 <div class="insight">
 <h3>✨ Insights</h3>
 
-<p>When a <code>Composable</code> is added to the UI:</p>
+<p>When a <code>Composable</code> enters composition:</p>
 
 <ul>
-<li>Composition (our <code>@Composable</code> function) runs first</li>
-<li>Then all the <code>DisposableEffect</code>s in the order present in the code</li>
-<li>Then all the <code>SideEffect</code>s in the order present in the code</li>
-<li>and then all the <code>LaunchedEffect</code>s in the order present in the code</li>
+<li>Our <code>@Composable</code> function runs first</li>
+<li>Then the <code>DisposableEffect</code>, the <code>SideEffect</code> and the <code>LaunchedEffect</code> in that order</li>
 </ul>
 
-<p>When a <code>Composable</code> is removed from the UI:</p>
+<p>When a <code>Composable</code> exits composition:</p>
 
 <ul>
-<li>All the <code>onDispose</code>s run in <strong>reverse order</strong> of their corresponding <code>DisposableEffect</code>s</li>
+<li>The <code>onDispose</code> of the corresponding <code>DisposableEffect</code> runs</li>
 </ul>
+</div>
+
+<p>Let&#39;s make it slightly more interesting. Let&#39;s add <code>Effects</code> above and below the <code>TrafficLight</code></p>
+<div class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span></span><span class="nd">@Composable</span>
+<span class="kd">fun</span> <span class="nf">TouchAndGo</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nv">isVisible</span> <span class="k">by</span> <span class="n">remember</span> <span class="p">{</span> <span class="n">mutableStateOf</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span> <span class="p">}</span>
+    <span class="n">Box</span><span class="p">(</span>
+        <span class="cm">/*...*/</span>
+    <span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">isVisible</span><span class="p">)</span> <span class="p">{</span>
+<span class="hll">            <span class="n">Effects</span><span class="p">(</span><span class="s">&quot;Pre - TrafficLight(🟢)&quot;</span><span class="p">)</span>
+</span>            <span class="n">TrafficLight</span><span class="p">(</span><span class="n">lightEmoji</span> <span class="o">=</span> <span class="s">&quot;🟢&quot;</span><span class="p">)</span>
+<span class="hll">            <span class="n">Effects</span><span class="p">(</span><span class="s">&quot;Post - TrafficLight(🟢)&quot;</span><span class="p">)</span>
+</span>        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>So what do we have on the logs now?</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>---Click---------------------
+<a id="line-2" name="line-2"></a>Pre - TrafficLight(🟢)    - Registering Effects
+<a id="line-3" name="line-3"></a>TrafficLight(🟢)          - Registering Effects
+<a id="line-4" name="line-4"></a>Post - TrafficLight(🟢)   - Registering Effects
+<a id="line-5" name="line-5"></a>Pre - TrafficLight(🟢)    - DisposableEffect
+<a id="line-6" name="line-6"></a>TrafficLight(🟢)          - DisposableEffect
+<a id="line-7" name="line-7"></a>Post - TrafficLight(🟢)   - DisposableEffect
+<a id="line-8" name="line-8"></a>Pre - TrafficLight(🟢)    - SideEffect
+<a id="line-9" name="line-9"></a>TrafficLight(🟢)          - SideEffect
+<a id="line-10" name="line-10"></a>Post - TrafficLight(🟢)   - SideEffect
+<a id="line-11" name="line-11"></a>Pre - TrafficLight(🟢)    - LaunchedEffect
+<a id="line-12" name="line-12"></a>TrafficLight(🟢)          - LaunchedEffect
+<a id="line-13" name="line-13"></a>Post - TrafficLight(🟢)   - LaunchedEffect
+<a id="line-14" name="line-14"></a>---Click---------------------
+<a id="line-15" name="line-15"></a>Post - TrafficLight(🟢)   - onDispose
+<a id="line-16" name="line-16"></a>TrafficLight(🟢)          - onDispose
+<a id="line-17" name="line-17"></a>Pre - TrafficLight(🟢)    - onDispose
+</code></pre></div>
+<div class="insight">
+<h3>✨ Insights</h3>
+
+<p>On Entering Composition: </p>
+<ul>
+    <li>All the Side Effects run in the order they are declared / registered</li>
+    <li>Among the different Side Effects - <code>DisposableEffect</code>s run first, followed by <code>SideEffect</code>s, followed by <code>LaunchedEffect</code></li>
+</ul>
+
+<p>On Exiting Composition: </p>
+<ul>
+    <li><code>DisposableEffect</code>s are <i>disposed</i> in the <b>reverse</b> order they are declared / registered. <b>L</b>ast <b>I</b>n <b>F</b>irst <b>O</b>ut - LIFO. Like a stack!</li>
+</ul>
+
 </div>
 
 <hr>
@@ -145,33 +189,29 @@
 <video width="320" height="320" autoplay muted loop>
   <source src="https://i.imgur.com/pJWzmgh.mp4" type="video/mp4">
 </video>
-
-<p>Let&#39;s look at the logs. For brevity, we removed multiple logs for Composition and Effects</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>🟢 Composition
-<a id="line-2" name="line-2"></a>🟢 DisposableEffect
-<a id="line-3" name="line-3"></a>🟢 SideEffect
-<a id="line-4" name="line-4"></a>🟢 LaunchedEffect
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>TrafficLight(🟢)     - Registering Effects
+<a id="line-2" name="line-2"></a>TrafficLight(🟢)     - DisposableEffect
+<a id="line-3" name="line-3"></a>TrafficLight(🟢)     - SideEffect
+<a id="line-4" name="line-4"></a>TrafficLight(🟢)     - LaunchedEffect
 <a id="line-5" name="line-5"></a>---Click---------------------
-<a id="line-6" name="line-6"></a>🔴 Composition
-<a id="line-7" name="line-7"></a>🟢 onDispose
-<a id="line-8" name="line-8"></a>🔴 DisposableEffect
-<a id="line-9" name="line-9"></a>🔴 SideEffect
-<a id="line-10" name="line-10"></a>🔴 LaunchedEffect
+<a id="line-6" name="line-6"></a>TrafficLight(🔴)     - Registering Effects
+<a id="line-7" name="line-7"></a>TrafficLight(🟢)     - onDispose
+<a id="line-8" name="line-8"></a>TrafficLight(🔴)     - DisposableEffect
+<a id="line-9" name="line-9"></a>TrafficLight(🔴)     - SideEffect
+<a id="line-10" name="line-10"></a>TrafficLight(🔴)     - LaunchedEffect
 </code></pre></div>
-<p>One might have expected this, but it is an important aspect to keep in mind.</p>
-
 <div class="insight">
 <h3>✨ Insights</h3>
 <ul>
-<li>Composition of the <i>incoming composable</i>* runs before the <i>outgoing composable</i>* disposes (<code>onDispose</code>)</li>
-<li><code>DisposableEffect</code> of the <i>incoming composable</i>* runs after the <i>outgoing composable</i>* disposes (<code>onDispose</code>)</li>
+<li>Incoming <code>DisposableEffect</code>s are <b>registered before</b> the outgoing <code>DisposableEffect</code>s are <b>disposed</b></li>
+<li>Incoming <code>DisposableEffect</code>s are <b>run after</b> the outgoing <code>DisposableEffect</code>s are <b>disposed</b></li>
 </ul>
 
 </div>
 
-<blockquote>
-<p>*There is no notion of incoming and outgoing composable <em>objects</em> at runtime in the above example. I have chosen to word it that way since we are accustomed to object oriented thinking. Essentially at runtime, compose notices a <code>State</code> change, re-runs the corresponding code that is accessing the state. The re-run is what informs the runtime of which <code>DisposableEffect</code>s to dispose. We will come back to this notion of objects at runtime later</p>
-</blockquote>
+<p>One might have expected this, because compose runtime figures out what are <em>incoming</em> and what are <em>outgoing</em> only after it runs / re-runs our <code>Composable</code> functions based on the new <code>State</code>.</p>
+
+<p>Nevertheless, this is an important aspect to keep in mind. Since this makes it safe for two <code>Composable</code>s that are never in composition together, to <code>acquire</code>/<code>release</code> to the same resource in their <code>DisposableEffect</code>s.</p>
 
 <h2>Stop Fade Go</h2>
 
@@ -195,24 +235,24 @@
 </span><span class="hll">        <span class="p">}</span>
 </span>    <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div><div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>🟢 Composition
-<a id="line-2" name="line-2"></a>🟢 DisposableEffect
-<a id="line-3" name="line-3"></a>🟢 SideEffect
-<a id="line-4" name="line-4"></a>🟢 LaunchedEffect
+</code></pre></div><div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>TrafficLight(🟢)     - Registering Effects
+<a id="line-2" name="line-2"></a>TrafficLight(🟢)     - DisposableEffect
+<a id="line-3" name="line-3"></a>TrafficLight(🟢)     - SideEffect
+<a id="line-4" name="line-4"></a>TrafficLight(🟢)     - LaunchedEffect
 <a id="line-5" name="line-5"></a>---Click---------------------
-<a id="line-6" name="line-6"></a>🔴 Composition
-<a id="line-7" name="line-7"></a>🔴 DisposableEffect
-<a id="line-8" name="line-8"></a>🔴 SideEffect
-<a id="line-9" name="line-9"></a>🔴 LaunchedEffect
-<a id="line-10" name="line-10"></a>🟢 onDispose
+<a id="line-6" name="line-6"></a>TrafficLight(🔴)     - Registering Effects
+<a id="line-7" name="line-7"></a>TrafficLight(🔴)     - DisposableEffect
+<a id="line-8" name="line-8"></a>TrafficLight(🔴)     - SideEffect
+<a id="line-9" name="line-9"></a>TrafficLight(🔴)     - LaunchedEffect
+<a id="line-10" name="line-10"></a>TrafficLight(🟢)     - onDispose
 </code></pre></div>
 <div class="insight">
 <h3>✨ Insights</h3>
 
-<p>When animated, the outgoing composable is disposed only after the animation is complete</p>
+<p>When animated, the outgoing <code>DisposableEffect</code>s are disposed only after the animation is complete</p>
 </div>
 
-<p>Might feel obvious in hindsight. But it is important to keep in mind that since the <code>DisposableEffect</code> of the incoming composable runs before the <code>onDispose</code> of the outgoing composable, if they are trying to attach to the same instance or acquire the same resource, it might create issues.</p>
+<p>Might feel obvious in hindsight. But it is important to keep in mind that since the <em>incoming</em> <code>DisposableEffect</code> runs before the <em>outgoing</em> disposes. This basically doesn&#39;t allow those <code>Composable</code>s to acquire/attach-to the same resource.</p>
 
 <hr>
 
@@ -251,18 +291,22 @@
 <video width="320" height="320" autoplay muted loop>
   <source src="https://i.imgur.com/dEqERF5.mp4" type="video/mp4">
 </video>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>🔴 Composition
-<a id="line-2" name="line-2"></a>🔴 DisposableEffect
-<a id="line-3" name="line-3"></a>🔴 SideEffect
-<a id="line-4" name="line-4"></a>🔴 LaunchedEffect
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>TrafficLight(🔴)     - Registering Effects
+<a id="line-2" name="line-2"></a>TrafficLight(🔴)     - DisposableEffect
+<a id="line-3" name="line-3"></a>TrafficLight(🔴)     - SideEffect
+<a id="line-4" name="line-4"></a>TrafficLight(🔴)     - LaunchedEffect
 <a id="line-5" name="line-5"></a>---Click---------------------
 <a id="line-6" name="line-6"></a>---Click---------------------
-<a id="line-7" name="line-7"></a>🟢 Composition
-<a id="line-8" name="line-8"></a>🔴 onDispose
-<a id="line-9" name="line-9"></a>🟢 DisposableEffect
-<a id="line-10" name="line-10"></a>🟢 SideEffect
-<a id="line-11" name="line-11"></a>🟢 LaunchedEffect
+<a id="line-7" name="line-7"></a>TrafficLight(🟢)     - Registering Effects
+<a id="line-8" name="line-8"></a>TrafficLight(🔴)     - onDispose
+<a id="line-9" name="line-9"></a>TrafficLight(🟢)     - DisposableEffect
+<a id="line-10" name="line-10"></a>TrafficLight(🟢)     - SideEffect
+<a id="line-11" name="line-11"></a>TrafficLight(🟢)     - LaunchedEffect
 </code></pre></div>
+<blockquote>
+<p>Note that for both &quot;Ready&quot; and &quot;Set&quot; states, the light is 🔴</p>
+</blockquote>
+
 <div class="insight">
 <h3>✨ Insights</h3>
 
@@ -309,49 +353,35 @@
 <span class="hll">    <span class="n">light</span><span class="p">:</span> <span class="n">Light</span><span class="p">,</span>
 </span>    <span class="n">modifier</span><span class="p">:</span> <span class="n">Modifier</span> <span class="o">=</span> <span class="n">Modifier</span>
 <span class="p">)</span> <span class="p">{</span>
-    <span class="kd">val</span> <span class="nv">lightEmoji</span> <span class="o">=</span> <span class="n">light</span><span class="p">.</span><span class="na">emoji</span>
-    <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s"> Composition&quot;</span><span class="p">)</span>
+<span class="hll">    <span class="kd">val</span> <span class="nv">lightEmoji</span> <span class="o">=</span> <span class="n">light</span><span class="p">.</span><span class="na">emoji</span>
+</span>    <span class="n">Text</span><span class="p">(</span><span class="n">lightEmoji</span><span class="p">,</span> <span class="n">fontSize</span> <span class="o">=</span> <span class="m">120.</span><span class="n">sp</span><span class="p">,</span> <span class="n">modifier</span> <span class="o">=</span> <span class="n">modifier</span><span class="p">)</span>
 
-    <span class="n">Text</span><span class="p">(</span><span class="n">lightEmoji</span><span class="p">,</span> <span class="n">fontSize</span> <span class="o">=</span> <span class="m">120.</span><span class="n">sp</span><span class="p">,</span> <span class="n">modifier</span> <span class="o">=</span> <span class="n">modifier</span><span class="p">)</span>
-
-<span class="hll">    <span class="n">DisposableEffect</span><span class="p">(</span><span class="n">light</span><span class="p">)</span> <span class="p">{</span>
-</span>        <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s"> DisposableEffect&quot;</span><span class="p">)</span>
-
-        <span class="n">onDispose</span> <span class="p">{</span>
-            <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s"> onDispose&quot;</span><span class="p">)</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-    <span class="n">SideEffect</span> <span class="p">{</span>
-        <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s"> SideEffect&quot;</span><span class="p">)</span>
-    <span class="p">}</span>
-<span class="hll">    <span class="n">LaunchedEffect</span><span class="p">(</span><span class="n">light</span><span class="p">)</span> <span class="p">{</span>
-</span>        <span class="n">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s"> LaunchedEffect&quot;</span><span class="p">)</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+<span class="hll">    <span class="n">Effects</span><span class="p">(</span><span class="s">&quot;TrafficLight(</span><span class="si">$</span><span class="n">lightEmoji</span><span class="s">)&quot;</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">light</span><span class="p">)</span>
+</span><span class="p">}</span>
 </code></pre></div>
 <p>Here are the logs after the change</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>🔴 Composition
-<a id="line-2" name="line-2"></a>🔴 DisposableEffect
-<a id="line-3" name="line-3"></a>🔴 SideEffect
-<a id="line-4" name="line-4"></a>🔴 LaunchedEffect
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>TrafficLight(🔴)     - Registering Effects
+<a id="line-2" name="line-2"></a>TrafficLight(🔴)     - DisposableEffect
+<a id="line-3" name="line-3"></a>TrafficLight(🔴)     - SideEffect
+<a id="line-4" name="line-4"></a>TrafficLight(🔴)     - LaunchedEffect
 <a id="line-5" name="line-5"></a>---Click---------------------
-<a id="line-6" name="line-6"></a>🔴 Composition
-<a id="line-7" name="line-7"></a>🔴 onDispose
-<a id="line-8" name="line-8"></a>🔴 DisposableEffect
-<a id="line-9" name="line-9"></a>🔴 SideEffect
-<a id="line-10" name="line-10"></a>🔴 LaunchedEffect
+<a id="line-6" name="line-6"></a>TrafficLight(🔴)     - Registering Effects
+<a id="line-7" name="line-7"></a>TrafficLight(🔴)     - onDispose
+<a id="line-8" name="line-8"></a>TrafficLight(🔴)     - DisposableEffect
+<a id="line-9" name="line-9"></a>TrafficLight(🔴)     - SideEffect
+<a id="line-10" name="line-10"></a>TrafficLight(🔴)     - LaunchedEffect
 <a id="line-11" name="line-11"></a>---Click---------------------
-<a id="line-12" name="line-12"></a>🟢 Composition
-<a id="line-13" name="line-13"></a>🔴 onDispose
-<a id="line-14" name="line-14"></a>🟢 DisposableEffect
-<a id="line-15" name="line-15"></a>🟢 SideEffect
-<a id="line-16" name="line-16"></a>🟢 LaunchedEffect
+<a id="line-12" name="line-12"></a>TrafficLight(🟢)     - Registering Effects
+<a id="line-13" name="line-13"></a>TrafficLight(🔴)     - onDispose
+<a id="line-14" name="line-14"></a>TrafficLight(🟢)     - DisposableEffect
+<a id="line-15" name="line-15"></a>TrafficLight(🟢)     - SideEffect
+<a id="line-16" name="line-16"></a>TrafficLight(🟢)     - LaunchedEffect
 </code></pre></div>
 <p>Well what happened there!</p>
 
-<p>Our <code>Light</code> doesn&#39;t implement <code>.equals()</code>, the default implementation returns true only if they are the same instances. But we are creating a new instance every time. So compose runtime sees these as different inputs.</p>
+<p>Our <code>Light</code> doesn&#39;t implement <code>.equals()</code>. The default implementation returns true only if they are the same instances. But we are creating a new instance every time. So compose runtime sees these as different inputs.</p>
 
-<p>Let&#39;s add a log to equals</p>
+<p>Let&#39;s add a log to <code>equals()</code></p>
 <div class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span></span><span class="kd">private</span> <span class="kd">class</span> <span class="nc">Light</span><span class="p">(</span><span class="kd">val</span> <span class="nv">emoji</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">override</span> <span class="kd">fun</span> <span class="nf">equals</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="kt">Any?</span><span class="p">):</span> <span class="kt">Boolean</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">other</span> <span class="k">is</span> <span class="n">Light</span><span class="p">)</span> <span class="p">{</span>
@@ -366,30 +396,34 @@
 <p>Haven&#39;t changed the implementation yet. Just added a log.</p>
 
 <p>The same logs as above but with <code>equals()</code></p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>🔴 Composition
-<a id="line-2" name="line-2"></a>🔴 DisposableEffect
-<a id="line-3" name="line-3"></a>🔴 SideEffect
-<a id="line-4" name="line-4"></a>🔴 LaunchedEffect
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>TrafficLight(🔴)     - Registering Effects
+<a id="line-2" name="line-2"></a>TrafficLight(🔴)     - DisposableEffect
+<a id="line-3" name="line-3"></a>TrafficLight(🔴)     - SideEffect
+<a id="line-4" name="line-4"></a>TrafficLight(🔴)     - LaunchedEffect
 <a id="line-5" name="line-5"></a>---Click---------------------
 <a id="line-6" name="line-6"></a>🔴.equals(🔴) = false
-<a id="line-7" name="line-7"></a>🔴 Composition
+<a id="line-7" name="line-7"></a>TrafficLight(🔴)     - Registering Effects
 <a id="line-8" name="line-8"></a>🔴.equals(🔴) = false
 <a id="line-9" name="line-9"></a>🔴.equals(🔴) = false
-<a id="line-10" name="line-10"></a>🔴 onDispose
-<a id="line-11" name="line-11"></a>🔴 DisposableEffect
-<a id="line-12" name="line-12"></a>🔴 SideEffect
-<a id="line-13" name="line-13"></a>🔴 LaunchedEffect
+<a id="line-10" name="line-10"></a>TrafficLight(🔴)     - onDispose
+<a id="line-11" name="line-11"></a>TrafficLight(🔴)     - DisposableEffect
+<a id="line-12" name="line-12"></a>TrafficLight(🔴)     - SideEffect
+<a id="line-13" name="line-13"></a>TrafficLight(🔴)     - LaunchedEffect
 <a id="line-14" name="line-14"></a>---Click---------------------
 <a id="line-15" name="line-15"></a>🔴.equals(🟢) = false
-<a id="line-16" name="line-16"></a>🟢 Composition
+<a id="line-16" name="line-16"></a>TrafficLight(🟢)     - Registering Effects
 <a id="line-17" name="line-17"></a>🔴.equals(🟢) = false
 <a id="line-18" name="line-18"></a>🔴.equals(🟢) = false
-<a id="line-19" name="line-19"></a>🔴 onDispose
-<a id="line-20" name="line-20"></a>🟢 DisposableEffect
-<a id="line-21" name="line-21"></a>🟢 SideEffect
-<a id="line-22" name="line-22"></a>🟢 LaunchedEffect
+<a id="line-19" name="line-19"></a>TrafficLight(🔴)     - onDispose
+<a id="line-20" name="line-20"></a>TrafficLight(🟢)     - DisposableEffect
+<a id="line-21" name="line-21"></a>TrafficLight(🟢)     - SideEffect
+<a id="line-22" name="line-22"></a>TrafficLight(🟢)     - LaunchedEffect
 </code></pre></div>
 <p>So compose runtime compared the inputs. It observed that they are different (<code>.equals()</code> returned <code>false</code>), so ran the composable with the new input. It then compared the inputs again, to see if it has to run the <code>DisposableEffect</code> and the <code>LaunchedEffect</code> and ran them again because it received <code>false</code>.</p>
+
+<blockquote>
+<p>After all <code>DisposableEffect</code> and <code>LaunchedEffect</code> are <code>Composable</code> functions themselves</p>
+</blockquote>
 
 <p>Let&#39;s implement <code>equals()</code></p>
 <div class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span></span><span class="kd">private</span> <span class="kd">class</span> <span class="nc">Light</span><span class="p">(</span><span class="kd">val</span> <span class="nv">emoji</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="p">{</span>
@@ -402,21 +436,21 @@
         <span class="k">return</span> <span class="k">super</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
     <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div><div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>🔴 Composition
-<a id="line-2" name="line-2"></a>🔴 DisposableEffect
-<a id="line-3" name="line-3"></a>🔴 SideEffect
-<a id="line-4" name="line-4"></a>🔴 LaunchedEffect
+</code></pre></div><div class="highlight"><pre><code class="language-text" data-lang="text"><span></span><a id="line-1" name="line-1"></a>TrafficLight(🔴)     - Registering Effects
+<a id="line-2" name="line-2"></a>TrafficLight(🔴)     - DisposableEffect
+<a id="line-3" name="line-3"></a>TrafficLight(🔴)     - SideEffect
+<a id="line-4" name="line-4"></a>TrafficLight(🔴)     - LaunchedEffect
 <a id="line-5" name="line-5"></a>---Click---------------------
 <a id="line-6" name="line-6"></a>🔴.equals(🔴) = true
 <a id="line-7" name="line-7"></a>---Click---------------------
 <a id="line-8" name="line-8"></a>🔴.equals(🟢) = false
-<a id="line-9" name="line-9"></a>🟢 Composition
+<a id="line-9" name="line-9"></a>TrafficLight(🟢)     - Registering Effects
 <a id="line-10" name="line-10"></a>🔴.equals(🟢) = false
 <a id="line-11" name="line-11"></a>🔴.equals(🟢) = false
-<a id="line-12" name="line-12"></a>🔴 onDispose
-<a id="line-13" name="line-13"></a>🟢 DisposableEffect
-<a id="line-14" name="line-14"></a>🟢 SideEffect
-<a id="line-15" name="line-15"></a>🟢 LaunchedEffect
+<a id="line-12" name="line-12"></a>TrafficLight(🔴)     - onDispose
+<a id="line-13" name="line-13"></a>TrafficLight(🟢)     - DisposableEffect
+<a id="line-14" name="line-14"></a>TrafficLight(🟢)     - SideEffect
+<a id="line-15" name="line-15"></a>TrafficLight(🟢)     - LaunchedEffect
 </code></pre></div>
 <p>Back to normal.</p>
 
@@ -424,28 +458,25 @@
 
 <div class="insight">
 <h3>✨ Insights</h3>
-<p>🟩 When a <code>Composable</code> is added to the UI:</p>
-
+<p>➡️ On Entering Composition: </p>
 <ul>
-<li>Composition (our <code>@Composable</code> function) runs first</li>
-<li>Then all the <code>DisposableEffect</code>s in the order present in the code</li>
-<li>Then all the <code>SideEffect</code>s in the order present in the code</li>
-<li>and then all the <code>LaunchedEffect</code>s in the order present in the code</li>
+    <li>Our `Composable` function runs first</li>
+    <li>All the Side Effects run in the order they are declared / registered</li>
+    <li>Among the different Side Effects - <code>DisposableEffect</code>s run first, followed by <code>SideEffect</code>s, followed by <code>LaunchedEffect</code></li>
 </ul>
 
-<p>🗑️  When a <code>Composable</code> is removed from the UI:</p>
-
+<p>⬅️ On Exiting Composition: </p>
 <ul>
-<li>All the <code>onDispose</code>s run in <strong>reverse order</strong> as present in the code</li>
+    <li><code>DisposableEffect</code>s are <i>disposed</i> in the <b>reverse</b> order they are declared / registered. <b>L</b>ast <b>I</b>n <b>F</b>irst <b>O</b>ut - LIFO. Like a stack!</li>
 </ul>
 
 <p>🔀 When a composable is being replaced with another or recomposed with the new state:</p>
 <ul>
-<li>Composition of the <i>incoming composable</i>* runs before the <i>outgoing composable</i>* disposes (<code>onDispose</code>)</li>
-<li><code>DisposableEffect</code> of the <i>incoming composable</i>* runs after the <i>outgoing composable</i>* disposes (<code>onDispose</code>)</li>
+<li>Incoming <code>DisposableEffect</code>s are <b>registered before</b> the outgoing <code>DisposableEffect</code>s are <b>disposed</b></li>
+<li>Incoming <code>DisposableEffect</code>s are <b>run after</b> the outgoing <code>DisposableEffect</code>s are <b>disposed</b></li>
 </ul>
 
-<p>💫 When animated, the outgoing composable is disposed only after the animation is complete. Hence the incoming composable's <code>DisposableEffect</code>s run before the the outgoing composable disposes.</p>
+<p>💫 When animated, the outgoing <code>DisposableEffect</code>s are disposed only after the animation is complete.</p>
 
 <p>🚫 Composition and Effects are skipped when the inputs don't change. Inputs are compared using their <code>equals()</code> method</p>
 </div>]]></content><author><name>Manideep Polireddi</name></author><category term="okmanideep" /><category term="jetpack" /><category term="compose" /><category term="android" /><summary type="html"><![CDATA[Important aspect to any framework that relies on functions is to understand when they are invoked. Read along to get a crystal clear understanding]]></summary></entry><entry><title type="html">Dependency management in multi-module gradle projects</title><link href="https://okmanideep.github.io/dependency-management-in-multi-module-gradle-projects" rel="alternate" type="text/html" title="Dependency management in multi-module gradle projects" /><published>2017-11-02T05:50:00+05:30</published><updated>2017-11-02T05:50:00+05:30</updated><id>https://okmanideep.github.io/dependency-management-in-multi-module-gradle-projects</id><content type="html" xml:base="https://okmanideep.github.io/dependency-management-in-multi-module-gradle-projects"><![CDATA[<p>Google&#39;s approach in <a href="https://github.com/googlesamples/android-architecture-components/">this google samples repo</a> seems to be tackling it very well. They actually do it across multiple projects but it applies for multiple modules as well. If you just have one module, don&#39;t bother doing this right now, but remember to do it when you decide to extract a module out.</p>
