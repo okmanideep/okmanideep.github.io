@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.0">Jekyll</generator><link href="https://okmanideep.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://okmanideep.github.io/" rel="alternate" type="text/html" /><updated>2022-04-15T19:57:12+05:30</updated><id>https://okmanideep.github.io/feed.xml</id><title type="html">@okmanideep</title><subtitle>Android · Development · Design</subtitle><author><name>Manideep Polireddi</name></author><entry><title type="html">Understanding Composition and Side Effects</title><link href="https://okmanideep.github.io/understanding-composition-and-side-effects" rel="alternate" type="text/html" title="Understanding Composition and Side Effects" /><published>2022-04-01T23:30:00+05:30</published><updated>2022-04-01T23:30:00+05:30</updated><id>https://okmanideep.github.io/understanding-composition-and-side-effects</id><content type="html" xml:base="https://okmanideep.github.io/understanding-composition-and-side-effects"><![CDATA[<style>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.0">Jekyll</generator><link href="https://okmanideep.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://okmanideep.github.io/" rel="alternate" type="text/html" /><updated>2022-04-16T14:00:16+05:30</updated><id>https://okmanideep.github.io/feed.xml</id><title type="html">@okmanideep</title><subtitle>Android · Development · Design</subtitle><author><name>Manideep Polireddi</name></author><entry><title type="html">[Draft] Understanding Composition and Side Effects</title><link href="https://okmanideep.github.io/understanding-composition-and-side-effects" rel="alternate" type="text/html" title="[Draft] Understanding Composition and Side Effects" /><published>2022-04-01T23:30:00+05:30</published><updated>2022-04-01T23:30:00+05:30</updated><id>https://okmanideep.github.io/understanding-composition-and-side-effects</id><content type="html" xml:base="https://okmanideep.github.io/understanding-composition-and-side-effects"><![CDATA[<style>
 .insight {
     background: #3B4354;
     border-radius: 3px;
@@ -115,32 +115,10 @@
 <p>When a <code>Composable</code> is removed from the UI:</p>
 
 <ul>
-<li>All the <code>onDispose</code>s run in <strong>reverse order</strong> as present in the code</li>
+<li>All the <code>onDispose</code>s run in <strong>reverse order</strong> of their corresponding <code>DisposableEffect</code>s</li>
 </ul>
 </div>
 
-<h3>💡 Tip!</h3>
-
-<p>Arrange your code to reflect the order of execution. Keep all the effects at the end of the function in the order of <code>DisposableEffect</code>, <code>SideEffect</code> and <code>LaunchedEffect</code>. It helps discover some code smells by making them slightly more apparent.</p>
-<div class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span></span><a id="line-1" name="line-1"></a><span class="nd">@Composable</span>
-<a id="line-2" name="line-2"></a><span class="kd">fun</span> <span class="nf">MyComponent</span><span class="p">(</span><span class="cm">/*...*/</span><span class="p">)</span> <span class="p">{</span>
-<a id="line-3" name="line-3"></a>    <span class="c1">// Describe the UI</span>
-<a id="line-4" name="line-4"></a>
-<a id="line-5" name="line-5"></a>    <span class="n">DisposableEffect</span><span class="p">(</span><span class="cm">/*...*/</span><span class="p">)</span> <span class="p">{</span>
-<a id="line-6" name="line-6"></a>        <span class="c1">// acquire resource / attach</span>
-<a id="line-7" name="line-7"></a>
-<a id="line-8" name="line-8"></a>        <span class="n">onDispose</span> <span class="p">{</span>
-<a id="line-9" name="line-9"></a>            <span class="c1">// release resource / detach</span>
-<a id="line-10" name="line-10"></a>        <span class="p">}</span>
-<a id="line-11" name="line-11"></a>    <span class="p">}</span>
-<a id="line-12" name="line-12"></a>    <span class="n">SideEffect</span> <span class="p">{</span>
-<a id="line-13" name="line-13"></a>        <span class="c1">// ...</span>
-<a id="line-14" name="line-14"></a>    <span class="p">}</span>
-<a id="line-15" name="line-15"></a>    <span class="n">LaunchedEffect</span><span class="p">(</span><span class="cm">/*...*/</span><span class="p">)</span> <span class="p">{</span>
-<a id="line-16" name="line-16"></a>        <span class="c1">// ...</span>
-<a id="line-17" name="line-17"></a>    <span class="p">}</span>
-<a id="line-18" name="line-18"></a><span class="p">}</span>
-</code></pre></div>
 <hr>
 
 <h2>Stop And Go</h2>

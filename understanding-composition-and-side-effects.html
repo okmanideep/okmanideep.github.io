@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- [[! Page Meta ]] -->
-    <title>Understanding Composition and Side Effects</title>
+    <title>[Draft] Understanding Composition and Side Effects</title>
     <meta name="description" content="@okmanideep - Android · Development · Design" />
 
     <meta name="HandheldFriendly" content="True" />
@@ -26,7 +26,7 @@
 
     <meta property="og:site_name" content="@okmanideep" />
     <meta property="og:type" content="article" />
-    <meta property="og:title" content="Understanding Composition and Side Effects" />
+    <meta property="og:title" content="[Draft] Understanding Composition and Side Effects" />
     <meta property="og:description" content="Important aspect to any framework that relies on functions is to understand when they are invoked. Read along to get a crystal clear understanding" />
     <meta property="og:url" content="https://okmanideep.github.io/understanding-composition-and-side-effects" />
     <meta property="og:image" content="https://okmanideep.github.io/assets/logo-black-on-white-square-20105d9e3b41defc83bbf981802e512e19a10853e8eeb5976222f9311ca6f8b8.jpg" />
@@ -34,7 +34,7 @@
     <meta property="article:author" content="https://www.facebook.com/manideepiitb">
 
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Understanding Composition and Side Effects" />
+    <meta name="twitter:title" content="[Draft] Understanding Composition and Side Effects" />
     <meta name="twitter:description" content="Important aspect to any framework that relies on functions is to understand when they are invoked. Read along to get a crystal clear understanding" />
     <meta name="twitter:image" content="https://okmanideep.github.io/assets/logo-black-on-white-square-20105d9e3b41defc83bbf981802e512e19a10853e8eeb5976222f9311ca6f8b8.jpg" />
     <meta name="twitter:author" content="@okmanideep">
@@ -100,7 +100,7 @@
     <article class="post tag-android">
 
         <header class="post-header">
-            <h1 class="post-title">Understanding Composition and Side Effects</h1>
+            <h1 class="post-title">[Draft] Understanding Composition and Side Effects</h1>
             <section class="post-meta">
             <!-- <a href=''>Manideep Polireddi</a> -->
             <time class="post-date" datetime="2022-04-01">01 Apr 2022</time>
@@ -242,32 +242,10 @@
 <p>When a <code>Composable</code> is removed from the UI:</p>
 
 <ul>
-<li>All the <code>onDispose</code>s run in <strong>reverse order</strong> as present in the code</li>
+<li>All the <code>onDispose</code>s run in <strong>reverse order</strong> of their corresponding <code>DisposableEffect</code>s</li>
 </ul>
 </div>
 
-<h3>💡 Tip!</h3>
-
-<p>Arrange your code to reflect the order of execution. Keep all the effects at the end of the function in the order of <code>DisposableEffect</code>, <code>SideEffect</code> and <code>LaunchedEffect</code>. It helps discover some code smells by making them slightly more apparent.</p>
-<div class="highlight"><pre><code class="language-kotlin" data-lang="kotlin"><span></span><a id="line-1" name="line-1"></a><span class="nd">@Composable</span>
-<a id="line-2" name="line-2"></a><span class="kd">fun</span> <span class="nf">MyComponent</span><span class="p">(</span><span class="cm">/*...*/</span><span class="p">)</span> <span class="p">{</span>
-<a id="line-3" name="line-3"></a>    <span class="c1">// Describe the UI</span>
-<a id="line-4" name="line-4"></a>
-<a id="line-5" name="line-5"></a>    <span class="n">DisposableEffect</span><span class="p">(</span><span class="cm">/*...*/</span><span class="p">)</span> <span class="p">{</span>
-<a id="line-6" name="line-6"></a>        <span class="c1">// acquire resource / attach</span>
-<a id="line-7" name="line-7"></a>
-<a id="line-8" name="line-8"></a>        <span class="n">onDispose</span> <span class="p">{</span>
-<a id="line-9" name="line-9"></a>            <span class="c1">// release resource / detach</span>
-<a id="line-10" name="line-10"></a>        <span class="p">}</span>
-<a id="line-11" name="line-11"></a>    <span class="p">}</span>
-<a id="line-12" name="line-12"></a>    <span class="n">SideEffect</span> <span class="p">{</span>
-<a id="line-13" name="line-13"></a>        <span class="c1">// ...</span>
-<a id="line-14" name="line-14"></a>    <span class="p">}</span>
-<a id="line-15" name="line-15"></a>    <span class="n">LaunchedEffect</span><span class="p">(</span><span class="cm">/*...*/</span><span class="p">)</span> <span class="p">{</span>
-<a id="line-16" name="line-16"></a>        <span class="c1">// ...</span>
-<a id="line-17" name="line-17"></a>    <span class="p">}</span>
-<a id="line-18" name="line-18"></a><span class="p">}</span>
-</code></pre></div>
 <hr>
 
 <h2>Stop And Go</h2>
