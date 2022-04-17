@@ -10,7 +10,7 @@ gem "jekyll-paginate", "~> 1.1"
 
 gem "jekyll-feed", "~> 0.16.0"
 
-gem "jekyll", "= 3.7"
+gem "jekyll", "~> 3.7.4"
 
 gem "pygments.rb", "~> 2.3"
 
