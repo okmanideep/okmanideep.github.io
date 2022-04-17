@@ -108,7 +108,60 @@ Initially we show nothing. On click, we show the green light 🟢.
   <source src="https://i.imgur.com/TCy72F9.mp4" type="video/mp4">
 </video>
 
-So these are the logs
+Together, this is what we have got
+
+```kotlin
+@Composable
+fun TouchAndGo() {
+    var isVisible by remember { mutableStateOf(false) }
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable {
+                log("---Click---------------------")
+                isVisible = !isVisible
+            },
+    ) {
+        if (isVisible) {
+            TrafficLight(lightEmoji = "🟢")
+        }
+    }
+}
+
+@Composable
+fun TrafficLight(
+    lightEmoji: String,
+    modifier: Modifier = Modifier
+) {
+    Text(lightEmoji, fontSize = 120.sp, modifier = modifier)
+
+    Effects("TrafficLight($lightEmoji)")
+}
+
+@Composable
+fun Effects(
+    logTag: String,
+    key: Any = logTag,
+) {
+    val tag = logTag.padEnd(25)
+    log("$tag - Registering Effects")
+    LaunchedEffect(key) {
+        log("$tag - LaunchedEffect")
+    }
+    DisposableEffect(key) {
+        log("$tag - DisposableEffect")
+        onDispose {
+            log("$tag - onDispose")
+        }
+    }
+    SideEffect {
+        log("$tag - SideEffect")
+    }
+}
+```
+
+Let's have a look at the logs
 
 ```
 ---Click---------------------
